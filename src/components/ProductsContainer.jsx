@@ -3,13 +3,14 @@ import ProductsGrid from "./ProductsGrid";
 import ProductsList from "./ProductsList";
 import { useState } from "react";
 import { BsFillGridFill, BsList } from "react-icons/bs";
+import FormTable from "./FormTable";
 
 // const ProductsContainer = () => {
 // const { meta } = useLoaderData();
 
 //using dummy
-const ProductsContainer = ({ products, meta }) => {
-  const totalProducts = meta.pagination.total;
+const ProductsContainer = ({ products }) => {
+  const totalProducts = products.length;
 
   const [layout, setLayout] = useState("grid");
 
@@ -23,28 +24,19 @@ const ProductsContainer = ({ products, meta }) => {
 
   return (
     <>
-      {/* HEADER */}
       <div className="flex justify-between items-center mt-8 border-b border-base-300 pb-5">
         <h4 className="font-medium text-md">
-          {totalProducts} product{totalProducts > 1 && "s"}
+          {totalProducts} product{totalProducts !== 1 ? "s" : ""}
         </h4>
-        <div className="flex gap-x-2">
-          <button className="btn btn-primary btn-block">Generate report</button>
-        </div>
       </div>
 
-      {/* PRODUCTS */}
-      <div>
-        {totalProducts === 0 ? (
-          <h5 className="text-2xl mt-16">
-            Sorry, no products matched your search...
-          </h5>
-        ) : layout === "grid" ? (
-          <ProductsGrid products={products} />
-        ) : (
-          <ProductsList products={products} />
-        )}
-      </div>
+      {totalProducts === 0 ? (
+        <h5 className="text-2xl mt-16">
+          Sorry, no products matched your search...
+        </h5>
+      ) : (
+        <ProductsList products={products} />
+      )}
     </>
   );
 };
