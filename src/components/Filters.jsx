@@ -1,60 +1,69 @@
 import { useMemo, useState } from "react";
 import { Form, Link } from "react-router-dom";
-import FormInput from "./FormInput";
+
 import FormMultiSelect from "./FormMultiSelect";
 import SectionTitle from "./SectionTitle";
 import { GrPowerReset } from "react-icons/gr";
 const Filters = ({ onFilterSubmit, products, onReset }) => {
-  // Compute the options for the select inputs
-  const titlesOptions = useMemo(
-    () => [...new Set(products.map((product) => product.attributes.title))],
-    [products]
-  );
-  const companiesOptions = useMemo(
-    () => [...new Set(products.map((product) => product.attributes.company))],
-    [products]
-  );
-  const pricesOptions = useMemo(
-    () => [...new Set(products.map((product) => product.attributes.price))],
-    [products]
-  );
+  const generateOptions = (attribute) =>
+    useMemo(
+      () => [
+        ...new Set(products.map((product) => product.attributes[attribute])),
+      ],
+      [products]
+    );
 
-  // Set state for the selected options
-  const [selectedTitles, setSelectedTitles] = useState([]);
-  const [selectedCompanies, setSelectedCompanies] = useState([]);
-  const [selectedPrices, setSelectedPrices] = useState([]);
+  // Options for select inputs
+  const titlesOptions = generateOptions("title");
+  const companiesOptions = generateOptions("company");
+  const pricesOptions = generateOptions("price");
+  const categoryOptions = generateOptions("category");
+  const shippingOptions = generateOptions("shipping");
+  const featuredOptions = generateOptions("featured");
 
-  const handleTitlesChange = (selectedOptions) => {
-    setSelectedTitles(selectedOptions || []);
-    // Reset selections for other fields when titles are cleared
-    if (!selectedOptions || selectedOptions.length === 0) {
-      setSelectedCompanies([]);
-      setSelectedPrices([]);
-    }
-  };
+  // Unified state for all selected options
+  const [selectedFilters, setSelectedFilters] = useState({
+    titles: [],
+    companies: [],
+    prices: [],
+    category: [],
+    shipping: [],
+    featured: [],
+  });
 
-  const handleCompaniesChange = (selectedOptions) => {
-    setSelectedCompanies(selectedOptions || []);
-  };
+  // Handle change for any filter selection
+  const handleChange = (filter, options) =>
+    setSelectedFilters((prev) => ({ ...prev, [filter]: options || [] }));
 
-  const handlePricesChange = (selectedOptions) => {
-    setSelectedPrices(selectedOptions || []);
-  };
-
-  const handleSubmit = (event) => {
+  // Handle system1 submission
+  const handleSys1Submit = (event) => {
     event.preventDefault();
     onFilterSubmit({
-      titles: selectedTitles.map((option) => option.value),
-      companies: selectedCompanies.map((option) => option.value),
-      prices: selectedPrices.map((option) => option.value),
+      titles: selectedFilters.titles.map((option) => option.value),
+      companies: selectedFilters.companies.map((option) => option.value),
+      prices: selectedFilters.prices.map((option) => option.value),
     });
   };
 
-  // Reset handler
+  const handleSys2Submit = (event) => {
+    event.preventDefault();
+    onFilterSubmit({
+      category: selectedFilters.category.map((option) => option.value),
+      shipping: selectedFilters.shipping.map((option) => option.value),
+      featured: selectedFilters.featured.map((option) => option.value),
+    });
+  };
+
+  // Reset all filters
   const handleReset = () => {
-    setSelectedTitles([]);
-    setSelectedCompanies([]);
-    setSelectedPrices([]);
+    setSelectedFilters({
+      titles: [],
+      companies: [],
+      prices: [],
+      category: [],
+      shipping: [],
+      featured: [],
+    });
     onReset();
   };
 
@@ -62,7 +71,7 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
     <>
       <div className="bg-base-200 rounded-md p-4">
         <div className="flex justify-end">
-          <button onClick={onReset} className="btn btn-accent btn-primary">
+          <button onClick={handleReset} className="btn btn-accent btn-primary">
             <GrPowerReset className="h-6 w-6" />
             Reset
           </button>
@@ -74,17 +83,17 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
               label="Select Titles"
               name="titles"
               options={titlesOptions}
-              value={selectedTitles}
-              onChange={handleTitlesChange}
+              value={selectedFilters.titles}
+              onChange={(options) => handleChange("titles", options)}
               size="w-full"
             />
             <FormMultiSelect
               label="Select Companies"
               name="companies"
               options={companiesOptions}
-              value={selectedCompanies}
-              onChange={handleCompaniesChange}
-              disabled={selectedTitles.length === 0}
+              value={selectedFilters.companies}
+              onChange={(options) => handleChange("companies", options)}
+              disabled={selectedFilters.titles.length === 0}
               size="w-full"
             />
 
@@ -92,18 +101,18 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
               label="Select Prices"
               name="prices"
               options={pricesOptions}
-              value={selectedPrices}
-              onChange={handlePricesChange}
-              disabled={selectedTitles.length === 0}
+              value={selectedFilters.prices}
+              onChange={(options) => handleChange("prices", options)}
+              disabled={selectedFilters.titles.length === 0}
               size="w-full"
             />
             <FormMultiSelect
-              label="Select Prices"
-              name="prices"
-              options={pricesOptions}
-              value={selectedPrices}
-              onChange={handlePricesChange}
-              disabled={selectedTitles.length === 0}
+              label="Select Companies"
+              name="companies"
+              options={companiesOptions}
+              value={selectedFilters.companies}
+              onChange={(options) => handleChange("companies", options)}
+              disabled={selectedFilters.titles.length === 0}
               size="w-full"
             />
 
@@ -111,18 +120,18 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
               label="Select Prices"
               name="prices"
               options={pricesOptions}
-              value={selectedPrices}
-              onChange={handlePricesChange}
-              disabled={selectedTitles.length === 0}
+              value={selectedFilters.prices}
+              onChange={(options) => handleChange("prices", options)}
+              disabled={selectedFilters.titles.length === 0}
               size="w-full"
             />
             <FormMultiSelect
               label="Select Prices"
               name="prices"
               options={pricesOptions}
-              value={selectedPrices}
-              onChange={handlePricesChange}
-              disabled={selectedTitles.length === 0}
+              value={selectedFilters.prices}
+              onChange={(options) => handleChange("prices", options)}
+              disabled={selectedFilters.titles.length === 0}
               size="w-full"
             />
           </Form>
@@ -130,9 +139,9 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
           <div className="flex justify-end mt-4 space-x-4">
             <button
               type="submit"
-              className="btn btn-primary btn-sm"
-              disabled={selectedTitles.length === 0}
-              onClick={handleSubmit}
+              className="btn btn-primary"
+              disabled={!selectedFilters.titles.length}
+              onClick={handleSys1Submit}
             >
               Search Products
             </button>
@@ -142,32 +151,44 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
           <SectionTitle text="system2" />
           <Form className="grid gap-x-4 gap-y-8 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 items-center">
             <FormMultiSelect
-              label="Select Titles"
+              label="Select Categories"
               name="titles"
-              options={titlesOptions}
-              value={selectedTitles}
-              onChange={handleTitlesChange}
+              options={categoryOptions}
+              value={selectedFilters.category}
+              onChange={(options) => handleChange("category", options)}
               size="w-full"
             />
             <FormMultiSelect
-              label="Select Companies"
+              label="Select Shipping"
               name="companies"
-              options={companiesOptions}
-              value={selectedCompanies}
-              onChange={handleCompaniesChange}
-              disabled={selectedTitles.length === 0}
+              options={shippingOptions}
+              value={selectedFilters.shipping}
+              onChange={(options) => handleChange("shipping", options)}
+              disabled={selectedFilters.category.length === 0}
               size="w-full"
             />
+
             <FormMultiSelect
-              label="Select Prices"
+              label="Select Feature"
               name="prices"
-              options={pricesOptions}
-              value={selectedPrices}
-              onChange={handlePricesChange}
-              disabled={selectedTitles.length === 0}
+              options={featuredOptions}
+              value={selectedFilters.featured}
+              onChange={(options) => handleChange("featured", options)}
+              disabled={selectedFilters.category.length === 0}
               size="w-full"
             />
           </Form>
+          {/* BUTTONS */}
+          <div className="flex justify-end mt-4 space-x-4">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!selectedFilters.category.length}
+              onClick={handleSys2Submit}
+            >
+              Search Category
+            </button>
+          </div>
         </div>
       </div>
     </>

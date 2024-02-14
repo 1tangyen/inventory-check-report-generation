@@ -1,4 +1,3 @@
-// Adjusted FormCheckbox component
 const FormCheckbox = ({ label, name, checked, onChange, size }) => {
   return (
     <div className="form-control items-center">
