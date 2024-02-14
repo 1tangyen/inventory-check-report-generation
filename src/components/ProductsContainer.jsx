@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router-dom";
 import ProductsList from "./ProductsList";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // const ProductsContainer = () => {
 // const { meta } = useLoaderData();
@@ -8,21 +8,33 @@ import { useState } from "react";
 //using dummy
 const ProductsContainer = ({ products }) => {
   const totalProducts = products.length;
-  const [selectedPrices, setSelectedPrices] = useState(new Set());
+  const [selectedPrices, setSelectedPrices] = useState(() => {
+    // Initialize with all product price IDs
+    const allPriceKeys = products.map((product) => {
+      const {
+        id,
+        attributes: { price },
+      } = product;
+      return `${id}-${price}`;
+    });
+    return new Set(allPriceKeys);
+  });
 
-  const [layout, setLayout] = useState("grid");
-
-  const setActiveStyles = (pattern) => {
-    return `text-xl btn btn-circle btn-sm ${
-      pattern === layout
-        ? "btn-primary text-primary-content"
-        : "btn-ghost text-base-content"
-    }`;
-  };
+  useEffect(() => {
+    // If products data is dynamic, ensure selectedPrices updates when products change
+    const allPriceKeys = products.map((product) => {
+      const {
+        id,
+        attributes: { price },
+      } = product;
+      return `${id}-${price}`;
+    });
+    setSelectedPrices(new Set(allPriceKeys));
+  }, [products]);
 
   const handlePriceChange = (productId, price, isChecked) => {
-    setSelectedPrices((currentPrices) => {
-      const updatedPrices = new Set(currentPrices);
+    setSelectedPrices((prevSelectedPrices) => {
+      const updatedPrices = new Set(prevSelectedPrices);
       const priceKey = `${productId}-${price}`;
 
       if (isChecked) {
@@ -36,9 +48,41 @@ const ProductsContainer = ({ products }) => {
   };
 
   const handleNextStep = () => {
-    // Here you would handle the next step, possibly sending selectedPrices somewhere
-    // For demonstration, we'll just log them to the console
-    console.log(selectedPrices);
+    // Ensure selectedPrices is not empty
+    if (!selectedPrices.size) {
+      console.log("No prices selected");
+      return;
+    }
+
+    // Group by product details and aggregate prices
+    const groupedSelections = Array.from(selectedPrices).reduce(
+      (acc, priceKey) => {
+        const [productId, price] = priceKey.split("-");
+        const product = products.find((p) => p.id.toString() === productId);
+
+        if (!product) {
+          console.warn(`Product not found for ID: ${productId}`);
+          return acc;
+        }
+
+        const { title, company, category } = product.attributes;
+        const key = `${title}-${company}-${category}`;
+
+        if (!acc[key]) {
+          acc[key] = { title, company, category, prices: [price] };
+        } else {
+          acc[key].prices.push(price);
+        }
+
+        return acc;
+      },
+      {}
+    );
+
+    // Convert the groupedSelections object to an array of its values
+    const detailedSelections = Object.values(groupedSelections);
+
+    console.log("Detailed selections:", detailedSelections);
   };
 
   return (
