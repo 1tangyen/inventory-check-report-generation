@@ -1,9 +1,6 @@
 import { useLoaderData } from "react-router-dom";
-import ProductsGrid from "./ProductsGrid";
 import ProductsList from "./ProductsList";
 import { useState } from "react";
-import { BsFillGridFill, BsList } from "react-icons/bs";
-import FormTable from "./FormTable";
 
 // const ProductsContainer = () => {
 // const { meta } = useLoaderData();
@@ -11,6 +8,7 @@ import FormTable from "./FormTable";
 //using dummy
 const ProductsContainer = ({ products }) => {
   const totalProducts = products.length;
+  const [selectedPrices, setSelectedPrices] = useState(new Set());
 
   const [layout, setLayout] = useState("grid");
 
@@ -20,6 +18,27 @@ const ProductsContainer = ({ products }) => {
         ? "btn-primary text-primary-content"
         : "btn-ghost text-base-content"
     }`;
+  };
+
+  const handlePriceChange = (productId, price, isChecked) => {
+    setSelectedPrices((currentPrices) => {
+      const updatedPrices = new Set(currentPrices);
+      const priceKey = `${productId}-${price}`;
+
+      if (isChecked) {
+        updatedPrices.add(priceKey);
+      } else {
+        updatedPrices.delete(priceKey);
+      }
+
+      return updatedPrices;
+    });
+  };
+
+  const handleNextStep = () => {
+    // Here you would handle the next step, possibly sending selectedPrices somewhere
+    // For demonstration, we'll just log them to the console
+    console.log(selectedPrices);
   };
 
   return (
@@ -35,7 +54,22 @@ const ProductsContainer = ({ products }) => {
           Sorry, no products matched your search...
         </h5>
       ) : (
-        <ProductsList products={products} />
+        <>
+          <ProductsList
+            products={products}
+            selectedPrices={selectedPrices}
+            onPriceChange={handlePriceChange}
+          />
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={handleNextStep}
+              className="btn btn-primary"
+              type="button"
+            >
+              Next Step
+            </button>
+          </div>
+        </>
       )}
     </>
   );
