@@ -4,62 +4,80 @@ import { Form, Link } from "react-router-dom";
 import FormMultiSelect from "./FormMultiSelect";
 import SectionTitle from "./SectionTitle";
 import { GrPowerReset } from "react-icons/gr";
-const Filters = ({ onFilterSubmit, products, onReset }) => {
-  const generateOptions = (attribute) =>
-    useMemo(
-      () => [
-        ...new Set(products.map((product) => product.attributes[attribute])),
-      ],
-      [products]
-    );
 
-  // Options for select inputs
-  const titlesOptions = generateOptions("title");
-  const companiesOptions = generateOptions("company");
-  const pricesOptions = generateOptions("price");
-  const categoryOptions = generateOptions("category");
-  const shippingOptions = generateOptions("shipping");
-  const featuredOptions = generateOptions("featured");
-
-  // Unified state for all selected options
-  const [selectedFilters, setSelectedFilters] = useState({
+const Filters = ({
+  onFilterSubmit,
+  onReset,
+  titlesOptions,
+  companiesOptions,
+  pricesOptions,
+  categoryOptions,
+  shippingOptions,
+  featuredOptions,
+  system2Filters,
+}) => {
+  // State for selected options for both systems
+  const [selectedSys1Filters, setSelectedSys1Filters] = useState({
     titles: [],
     companies: [],
     prices: [],
+  });
+  const [selectedSys2Filters, setSelectedSys2Filters] = useState({
     category: [],
     shipping: [],
     featured: [],
   });
 
-  // Handle change for any filter selection
-  const handleChange = (filter, options) =>
-    setSelectedFilters((prev) => ({ ...prev, [filter]: options || [] }));
+  // Handle change for system1 filters
+  const handleSys1Change = (filter, selectedOption) => {
+    setSelectedSys1Filters((prevFilters) => ({
+      ...prevFilters,
+      [filter]: selectedOption || [],
+    }));
+  };
+
+  // Handle change for system2 filters
+  const handleSys2Change = (filter, selectedOption) => {
+    setSelectedSys2Filters((prevFilters) => ({
+      ...prevFilters,
+      [filter]: selectedOption || [],
+    }));
+  };
 
   // Handle system1 submission
   const handleSys1Submit = (event) => {
     event.preventDefault();
-    onFilterSubmit({
-      titles: selectedFilters.titles.map((option) => option.value),
-      companies: selectedFilters.companies.map((option) => option.value),
-      prices: selectedFilters.prices.map((option) => option.value),
-    });
+    onFilterSubmit(
+      {
+        titles: selectedSys1Filters.titles.map((option) => option.value),
+        companies: selectedSys1Filters.companies.map((option) => option.value),
+        prices: selectedSys1Filters.prices.map((option) => option.value),
+      },
+      null // No system2 filters yet
+    );
   };
 
+  // Handle system2 submission
   const handleSys2Submit = (event) => {
     event.preventDefault();
-    onFilterSubmit({
-      category: selectedFilters.category.map((option) => option.value),
-      shipping: selectedFilters.shipping.map((option) => option.value),
-      featured: selectedFilters.featured.map((option) => option.value),
-    });
+    onFilterSubmit(
+      null, // Keep system1 filters as they are
+      {
+        category: selectedSys2Filters.category.map((option) => option.value),
+        shipping: selectedSys2Filters.shipping.map((option) => option.value),
+        featured: selectedSys2Filters.featured.map((option) => option.value),
+      }
+    );
   };
 
-  // Reset all filters
+  // Unified reset for both systems
   const handleReset = () => {
-    setSelectedFilters({
+    setSelectedSys1Filters({
       titles: [],
       companies: [],
       prices: [],
+    });
+    setSelectedSys2Filters({
       category: [],
       shipping: [],
       featured: [],
@@ -83,17 +101,17 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
               label="Select Titles"
               name="titles"
               options={titlesOptions}
-              value={selectedFilters.titles}
-              onChange={(options) => handleChange("titles", options)}
+              value={selectedSys1Filters.titles}
+              onChange={(options) => handleSys1Change("titles", options)}
               size="w-full"
             />
             <FormMultiSelect
               label="Select Companies"
               name="companies"
               options={companiesOptions}
-              value={selectedFilters.companies}
-              onChange={(options) => handleChange("companies", options)}
-              disabled={selectedFilters.titles.length === 0}
+              value={selectedSys1Filters.companies}
+              onChange={(options) => handleSys1Change("companies", options)}
+              disabled={selectedSys1Filters.titles.length === 0}
               size="w-full"
             />
 
@@ -101,18 +119,18 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
               label="Select Prices"
               name="prices"
               options={pricesOptions}
-              value={selectedFilters.prices}
-              onChange={(options) => handleChange("prices", options)}
-              disabled={selectedFilters.titles.length === 0}
+              value={selectedSys1Filters.prices}
+              onChange={(options) => handleSys1Change("prices", options)}
+              disabled={selectedSys1Filters.titles.length === 0}
               size="w-full"
             />
             <FormMultiSelect
               label="Select Companies"
               name="companies"
               options={companiesOptions}
-              value={selectedFilters.companies}
-              onChange={(options) => handleChange("companies", options)}
-              disabled={selectedFilters.titles.length === 0}
+              value={selectedSys1Filters.companies}
+              onChange={(options) => handleSys1Change("companies", options)}
+              disabled={selectedSys1Filters.titles.length === 0}
               size="w-full"
             />
 
@@ -120,18 +138,18 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
               label="Select Prices"
               name="prices"
               options={pricesOptions}
-              value={selectedFilters.prices}
-              onChange={(options) => handleChange("prices", options)}
-              disabled={selectedFilters.titles.length === 0}
+              value={selectedSys1Filters.prices}
+              onChange={(options) => handleSys1Change("prices", options)}
+              disabled={selectedSys1Filters.titles.length === 0}
               size="w-full"
             />
             <FormMultiSelect
               label="Select Prices"
               name="prices"
               options={pricesOptions}
-              value={selectedFilters.prices}
-              onChange={(options) => handleChange("prices", options)}
-              disabled={selectedFilters.titles.length === 0}
+              value={selectedSys1Filters.prices}
+              onChange={(options) => handleSys1Change("prices", options)}
+              disabled={selectedSys1Filters.titles.length === 0}
               size="w-full"
             />
           </Form>
@@ -140,7 +158,7 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={!selectedFilters.titles.length}
+              disabled={!selectedSys1Filters.titles.length}
               onClick={handleSys1Submit}
             >
               Search Products
@@ -154,17 +172,17 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
               label="Select Categories"
               name="titles"
               options={categoryOptions}
-              value={selectedFilters.category}
-              onChange={(options) => handleChange("category", options)}
+              value={selectedSys2Filters.category}
+              onChange={(options) => handleSys2Change("category", options)}
               size="w-full"
             />
             <FormMultiSelect
               label="Select Shipping"
               name="companies"
               options={shippingOptions}
-              value={selectedFilters.shipping}
-              onChange={(options) => handleChange("shipping", options)}
-              disabled={selectedFilters.category.length === 0}
+              value={selectedSys2Filters.shipping}
+              onChange={(options) => handleSys2Change("shipping", options)}
+              disabled={selectedSys2Filters.category.length === 0}
               size="w-full"
             />
 
@@ -172,9 +190,9 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
               label="Select Feature"
               name="prices"
               options={featuredOptions}
-              value={selectedFilters.featured}
-              onChange={(options) => handleChange("featured", options)}
-              disabled={selectedFilters.category.length === 0}
+              value={selectedSys2Filters.featured}
+              onChange={(options) => handleSys2Change("featured", options)}
+              disabled={selectedSys2Filters.category.length === 0}
               size="w-full"
             />
           </Form>
@@ -183,7 +201,7 @@ const Filters = ({ onFilterSubmit, products, onReset }) => {
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={!selectedFilters.category.length}
+              disabled={!selectedSys2Filters.category.length}
               onClick={handleSys2Submit}
             >
               Search Category

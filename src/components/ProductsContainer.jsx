@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 // const { meta } = useLoaderData();
 
 //using dummy
-const ProductsContainer = ({ products }) => {
+const ProductsContainer = ({ products, enableNextStep }) => {
   const totalProducts = products.length;
   const [selectedPrices, setSelectedPrices] = useState(() => {
     // Initialize with all product price IDs

@@ -1,8 +1,8 @@
-import { Filters, Filters2, ProductsContainer } from "../components";
+import { Filters, ProductsContainer } from "../components";
 import { customFetch } from "../utils";
 import jsonData from "../assets/dummy.json";
 import { useLoaderData } from "react-router-dom";
-import React, { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 // const url = "/products";
 
@@ -16,56 +16,102 @@ import React, { useState, useCallback } from "react";
 const Products = () => {
   const [products, setProducts] = useState(jsonData.data);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [isFiltered, setIsFiltered] = useState(false);
-  const [isFilter2Active, setIsFilter2Active] = useState(false);
+  const [system1FiltersApplied, setSystem1FiltersApplied] = useState(false);
+  const [system2FiltersApplied, setSystem2FiltersApplied] = useState(false);
 
-  const handleFilterSubmit = useCallback((criteria) => {
-    const filtered = jsonData.data.filter((product) => {
-      const matchTitle =
-        criteria.titles.length === 0 ||
-        criteria.titles.includes(product.attributes.title);
-      const matchCompany =
-        criteria.companies.length === 0 ||
-        criteria.companies.includes(product.attributes.company);
-      const matchPrice =
-        criteria.prices.length === 0 ||
-        criteria.prices.includes(product.attributes.price.toString());
-      return matchTitle && matchCompany && matchPrice;
-    });
+  const handleFilterSubmit = useCallback((system1Criteria, system2Criteria) => {
+    let filtered = jsonData.data;
+
+    if (system1Criteria) {
+      filtered = filtered.filter((product) => {
+        const matchTitle =
+          system1Criteria.titles.length === 0 ||
+          system1Criteria.titles.includes(product.attributes.title);
+        const matchCompany =
+          system1Criteria.companies.length === 0 ||
+          system1Criteria.companies.includes(product.attributes.company);
+        const matchPrice =
+          system1Criteria.prices.length === 0 ||
+          system1Criteria.prices.includes(product.attributes.price.toString());
+        return matchTitle && matchCompany && matchPrice;
+      });
+      setSystem1FiltersApplied(true);
+    } else {
+      setSystem1FiltersApplied(false);
+    }
+
+    if (system2Criteria) {
+      filtered = filtered.filter((product) => {
+        const matchCategory =
+          system2Criteria.category.length === 0 ||
+          system2Criteria.category.includes(product.attributes.category);
+        const matchShipping =
+          system2Criteria.shipping.length === 0 ||
+          system2Criteria.shipping.includes(product.attributes.shipping);
+        const matchFeatured =
+          system2Criteria.featured.length === 0 ||
+          system2Criteria.featured.includes(product.attributes.featured);
+        return matchCategory && matchShipping && matchFeatured;
+      });
+      setSystem2FiltersApplied(true);
+    } else {
+      setSystem2FiltersApplied(false);
+    }
 
     setFilteredProducts(filtered);
-    setIsFiltered(true);
   }, []);
 
   const handleReset = useCallback(() => {
+    window.location.reload();
     setFilteredProducts([]);
-    setIsFiltered(false);
-    setIsFilter2Active(false);
+    setSystem1FiltersApplied(false);
+    setSystem2FiltersApplied(false);
   }, []);
 
-  const activateFilter2 = useCallback(() => {
-    setIsFilter2Active(true);
-  }, []);
+  const generateOptions = (attribute) =>
+    useMemo(
+      () => [
+        ...new Set(
+          jsonData.data.map((product) => product.attributes[attribute])
+        ),
+      ],
+      [products]
+    );
+
+  // Options for select inputs
+  const titlesOptions = generateOptions("title");
+  const companiesOptions = generateOptions("company");
+  const pricesOptions = generateOptions("price");
+  const categoryOptions = generateOptions("category");
+  const shippingOptions = generateOptions("shipping");
+  const featuredOptions = generateOptions("featured");
 
   return (
-    <div className="flex min-h-screen">
-      <div className="flex-grow p-4">
-        <Filters
-          onFilterSubmit={handleFilterSubmit}
-          products={products}
-          onReset={handleReset}
-        />
-        {isFilter2Active && <Filters2 />}
-      </div>
-      {isFiltered && (
+    <>
+      <div className="flex min-h-screen">
         <div className="flex-grow p-4">
-          <ProductsContainer
-            products={filteredProducts}
-            onActivateFilter2={activateFilter2}
+          <Filters
+            onFilterSubmit={handleFilterSubmit}
+            onReset={handleReset}
+            titlesOptions={titlesOptions}
+            companiesOptions={companiesOptions}
+            pricesOptions={pricesOptions}
+            categoryOptions={categoryOptions}
+            shippingOptions={shippingOptions}
+            featuredOptions={featuredOptions}
           />
         </div>
-      )}
-    </div>
+
+        {filteredProducts.length > 0 && (
+          <div className="w-2/3 p-4">
+            <ProductsContainer
+              products={filteredProducts}
+              enableNextStep={system1FiltersApplied && system2FiltersApplied}
+            />
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
