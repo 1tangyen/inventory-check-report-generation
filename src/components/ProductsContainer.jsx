@@ -1,120 +1,107 @@
-import { useLoaderData } from "react-router-dom";
-import ProductsList from "./ProductsList";
 import { useState, useEffect } from "react";
+import ProductsList from "./ProductsList";
 
-// const ProductsContainer = () => {
-// const { meta } = useLoaderData();
+const ProductsContainer = ({
+  products,
+  products2,
+  system1Criteria,
+  system2Criteria,
+  system1FiltersMessage,
+  system2FiltersMessage,
+}) => {
+  const [enableNextStep, setEnableNextStep] = useState(false);
 
-//using dummy
-const ProductsContainer = ({ products, enableNextStep }) => {
-  const totalProducts = products.length;
-  const [selectedPrices, setSelectedPrices] = useState(() => {
-    // Initialize with all product price IDs
-    const allPriceKeys = products.map((product) => {
-      const {
-        id,
-        attributes: { price },
-      } = product;
-      return `${id}-${price}`;
-    });
-    return new Set(allPriceKeys);
-  });
+  // Determine if there's at least one criteria from each system and if there are results for both products lists
+  useEffect(() => {
+    const criteria1Selected =
+      system1Criteria &&
+      Object.values(system1Criteria).some((criteria) => criteria.length > 0);
+    const criteria2Selected =
+      system2Criteria &&
+      Object.values(system2Criteria).some((criteria) => criteria.length > 0);
+    const bothSystemsSubmitted = criteria1Selected && criteria2Selected;
+    const eitherProductsEmpty = products.length === 0 || products2.length === 0;
+
+    setEnableNextStep(bothSystemsSubmitted && !eitherProductsEmpty);
+  }, [system1Criteria, system2Criteria, products, products2]);
+
+  const [selectedPrices, setSelectedPrices] = useState(
+    new Set([
+      ...products.map((product) => `${product.id}-${product.attributes.price}`),
+      ...products2.map(
+        (product) => `${product.id}-${product.attributes.price}`
+      ),
+    ])
+  );
 
   useEffect(() => {
-    // If products data is dynamic, ensure selectedPrices updates when products change
-    const allPriceKeys = products.map((product) => {
-      const {
-        id,
-        attributes: { price },
-      } = product;
-      return `${id}-${price}`;
-    });
-    setSelectedPrices(new Set(allPriceKeys));
-  }, [products]);
+    // Update selected prices if products change
+    const newSelectedPrices = new Set([
+      ...products.map((product) => `${product.id}-${product.attributes.price}`),
+      ...products2.map(
+        (product) => `${product.id}-${product.attributes.price}`
+      ),
+    ]);
+    setSelectedPrices(newSelectedPrices);
+  }, [products, products2]);
 
   const handlePriceChange = (productId, price, isChecked) => {
-    setSelectedPrices((prevSelectedPrices) => {
-      const updatedPrices = new Set(prevSelectedPrices);
-      const priceKey = `${productId}-${price}`;
-
-      if (isChecked) {
-        updatedPrices.add(priceKey);
-      } else {
-        updatedPrices.delete(priceKey);
-      }
-
-      return updatedPrices;
+    setSelectedPrices((current) => {
+      const updated = new Set(current);
+      const key = `${productId}-${price}`;
+      if (isChecked) updated.add(key);
+      else updated.delete(key);
+      return updated;
     });
   };
 
   const handleNextStep = () => {
-    // Ensure selectedPrices is not empty
-    if (!selectedPrices.size) {
-      console.log("No prices selected");
-      return;
-    }
-
-    // Group by product details and aggregate prices
-    const groupedSelections = Array.from(selectedPrices).reduce(
-      (acc, priceKey) => {
-        const [productId, price] = priceKey.split("-");
-        const product = products.find((p) => p.id.toString() === productId);
-
-        if (!product) {
-          console.warn(`Product not found for ID: ${productId}`);
-          return acc;
-        }
-
-        const { title, company, category } = product.attributes;
-        const key = `${title}-${company}-${category}`;
-
-        if (!acc[key]) {
-          acc[key] = { title, company, category, prices: [price] };
-        } else {
-          acc[key].prices.push(price);
-        }
-
-        return acc;
-      },
-      {}
+    console.log(
+      "Proceed to the next step with selected prices:",
+      Array.from(selectedPrices)
     );
-
-    // Convert the groupedSelections object to an array of its values
-    const detailedSelections = Object.values(groupedSelections);
-
-    console.log("Detailed selections:", detailedSelections);
   };
 
   return (
     <>
-      <div className="flex justify-between items-center mt-8 border-b border-base-300 pb-5">
-        <h4 className="font-medium text-md">
-          {totalProducts} product{totalProducts !== 1 ? "s" : ""}
-        </h4>
-      </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center mt-8">
+          <h4 className="font-medium text-md">
+            {enableNextStep
+              ? `System1: ${products.length} product(s)  System2: ${products2.length} product(s)`
+              : system1FiltersMessage || system2FiltersMessage}
+          </h4>
+        </div>
+        {/* Show sorry message if either list of products is empty */}
 
-      {totalProducts === 0 ? (
-        <h5 className="text-2xl mt-16">
-          Sorry, no products matched your search...
-        </h5>
-      ) : (
         <>
-          <ProductsList
-            products={products}
-            selectedPrices={selectedPrices}
-            onPriceChange={handlePriceChange}
-          />
-          <div className="flex justify-end mt-4">
+          <div>
+            <ProductsList
+              products={products}
+              selectedPrices={selectedPrices}
+              onPriceChange={handlePriceChange}
+              criteria={system1Criteria}
+            />
+          </div>
+          <div>
+            <ProductsList
+              products={products2}
+              selectedPrices={selectedPrices}
+              onPriceChange={handlePriceChange}
+              criteria={system2Criteria}
+            />
+          </div>
+          <div className="flex justify-end">
             <button
+              disabled={!enableNextStep}
               onClick={handleNextStep}
               className="btn btn-primary"
-              type="button"
             >
               Next Step
             </button>
           </div>
         </>
-      )}
+      </div>
     </>
   );
 };

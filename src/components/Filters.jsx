@@ -6,6 +6,7 @@ import SectionTitle from "./SectionTitle";
 import { GrPowerReset } from "react-icons/gr";
 
 const Filters = ({
+  onFilter1Submit,
   onFilterSubmit,
   onReset,
   titlesOptions,
@@ -14,7 +15,6 @@ const Filters = ({
   categoryOptions,
   shippingOptions,
   featuredOptions,
-  system2Filters,
 }) => {
   // State for selected options for both systems
   const [selectedSys1Filters, setSelectedSys1Filters] = useState({

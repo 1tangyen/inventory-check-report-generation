@@ -1,0 +1,133 @@
+{
+"data": [
+{
+"id": 119,
+"attributes": {
+"featured": "vfund",
+"category": "Kids",
+"shipping": "fund"
+}
+},
+{
+"id": 128,
+"attributes": {
+"featured": "etsy",
+"category": "Kids",
+"shipping": "etsy"
+}
+},
+{
+"id": 127,
+"attributes": {
+"featured": "carry",
+"category": "Kids",
+"shipping": "etsy"
+}
+},
+{
+"id": 112,
+"attributes": {
+"featured": "carry",
+"category": "wolf",
+"shipping": "carry"
+}
+},
+{
+"id": 114,
+"attributes": {
+"featured": "chillwave",
+"category": "Chairs",
+"shipping": "typewriter"
+}
+},
+{
+"id": 100,
+"attributes": {
+"featured": "kitsch",
+"category": "Chairs",
+"shipping": "kitsch"
+}
+},
+{
+"id": 111,
+"attributes": {
+"featured": "gochujang",
+"category": "Tables",
+"shipping": "pitchfork"
+}
+},
+{
+"id": 137,
+"attributes": {
+"featured": "banjo",
+"category": "Beds",
+"shipping": "gochujang"
+}
+},
+{
+"id": 193,
+"attributes": {
+"featured": "bread",
+"category": "Sofas",
+"shipping": "banjo"
+}
+},
+{
+"id": 205,
+"attributes": {
+"featured": "typewriter",
+"category": "Beds",
+"shipping": "yr"
+}
+},
+{
+"id": 116,
+"attributes": {
+"featured": "carry",
+"category": "Kids",
+"shipping": "Vexillologist"
+}
+},
+{
+"id": 211,
+"attributes": {
+"featured": "wolf",
+"category": "Tables",
+"shipping": "chillwave"
+}
+},
+{
+"id": 222,
+"attributes": {
+"featured": "pitchfork",
+"category": "Beds",
+"shipping": "kitsch"
+}
+},
+{
+"id": 214,
+"attributes": {
+"featured": "gochujang",
+"category": "Chairs",
+"shipping": "pok"
+}
+}
+],
+"meta": {
+"pagination": {
+"page": 1,
+"pageSize": 10,
+"pageCount": 3,
+"total": 22
+},
+"categories": [
+"all",
+"Tables",
+"Chairs",
+"Kids",
+"Sofas",
+"Beds"
+]
+
+}
+}
