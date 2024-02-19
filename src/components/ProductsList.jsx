@@ -7,8 +7,14 @@
 import { useState, useMemo } from "react";
 import FormCheckbox from "./FormCheckbox";
 
-const ProductList = ({ products, selectedPrices, onPriceChange }) => {
-  // Group products
+const ProductList = ({
+  products,
+  selectedPrices,
+  onPriceChange,
+  criteria,
+  system,
+}) => {
+  // Group products  if (system === 'system1')
   const groupedProducts = useMemo(() => {
     const grouped = {};
     products.forEach((product) => {
@@ -22,6 +28,7 @@ const ProductList = ({ products, selectedPrices, onPriceChange }) => {
           title,
           company,
           category,
+
           prices: [{ price, id }],
         };
       } else {
@@ -32,6 +39,7 @@ const ProductList = ({ products, selectedPrices, onPriceChange }) => {
     return Object.values(grouped);
   }, [products]);
 
+  // create div for selected categories, shipping, and features from system 2.
   return (
     <div className="mt-12 grid gap-y-8">
       {groupedProducts.map((group) => (

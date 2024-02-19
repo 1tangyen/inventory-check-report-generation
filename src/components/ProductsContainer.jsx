@@ -6,10 +6,10 @@ const ProductsContainer = ({
   products2,
   system1Criteria,
   system2Criteria,
-  system1FiltersMessage,
-  system2FiltersMessage,
 }) => {
   const [enableNextStep, setEnableNextStep] = useState(false);
+  console.log("system1Criteria", system2Criteria);
+  console.log("system2Criteria", system2Criteria);
 
   // Determine if there's at least one criteria from each system and if there are results for both products lists
   useEffect(() => {
@@ -43,7 +43,7 @@ const ProductsContainer = ({
       ),
     ]);
     setSelectedPrices(newSelectedPrices);
-  }, [products, products2]);
+  }, [products]);
 
   const handlePriceChange = (productId, price, isChecked) => {
     setSelectedPrices((current) => {
@@ -67,30 +67,33 @@ const ProductsContainer = ({
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center mt-8">
           <h4 className="font-medium text-md">
-            {enableNextStep
-              ? `System1: ${products.length} product(s)  System2: ${products2.length} product(s)`
-              : system1FiltersMessage || system2FiltersMessage}
+            {enableNextStep &&
+              `System1: ${products.length} product(s)  System2: ${products2.length} product(s)`}
           </h4>
         </div>
         {/* Show sorry message if either list of products is empty */}
 
         <>
-          <div>
+          {products.length > 0 && (
             <ProductsList
               products={products}
               selectedPrices={selectedPrices}
               onPriceChange={handlePriceChange}
               criteria={system1Criteria}
+              system={"system1"}
             />
-          </div>
-          <div>
+          )}
+
+          {products2.length > 0 && (
             <ProductsList
               products={products2}
               selectedPrices={selectedPrices}
               onPriceChange={handlePriceChange}
               criteria={system2Criteria}
+              system={"system2"}
             />
-          </div>
+          )}
+
           <div className="flex justify-end">
             <button
               disabled={!enableNextStep}

@@ -6,7 +6,7 @@ import SectionTitle from "./SectionTitle";
 import { GrPowerReset } from "react-icons/gr";
 
 const Filters = ({
-  onFilter1Submit,
+  system2HasResults,
   onFilterSubmit,
   onReset,
   titlesOptions,
@@ -201,7 +201,10 @@ const Filters = ({
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={!selectedSys2Filters.category.length}
+              // disabled={!selectedSys2Filters.category.length}
+              disabled={
+                !selectedSys2Filters.category.length || !system2HasResults
+              }
               onClick={handleSys2Submit}
             >
               Search Category

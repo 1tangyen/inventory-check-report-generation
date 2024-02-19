@@ -47,6 +47,11 @@ const Products = () => {
         });
         setFilteredProducts(filtered);
         setSystem1Criteria(system1Criteria);
+        setSystem1FiltersMessage(
+          filtered.length > 0
+            ? ""
+            : "Sorry, no products matched your search from System 1..."
+        );
       }
 
       if (system2Criteria) {
@@ -64,6 +69,11 @@ const Products = () => {
         });
         setFilteredProducts2(filtered2);
         setSystem2Criteria(system2Criteria);
+        setSystem2FiltersMessage(
+          filtered2.length > 0
+            ? ""
+            : "Sorry, no products matched your search from System 2..."
+        );
       }
     },
     [filteredProducts, filteredProducts2]
@@ -73,8 +83,10 @@ const Products = () => {
     window.location.reload();
     setSystem1Criteria(null);
     setSystem2Criteria(null);
-    //   setFilteredProducts([]);
-    //   setFilteredProducts2([]);
+    setFilteredProducts([]);
+    setFilteredProducts2([]);
+    setSystem1FiltersMessage("");
+    setSystem2FiltersMessage("");
   }, []);
 
   const generateOptions = (attribute, dataset) => {
@@ -100,6 +112,7 @@ const Products = () => {
           <Filters
             onFilterSubmit={handleFilterSubmit}
             onReset={handleFilterReset}
+            system2HasResults={filteredProducts.length > 0}
             titlesOptions={titlesOptions}
             companiesOptions={companiesOptions}
             pricesOptions={pricesOptions}
@@ -108,20 +121,24 @@ const Products = () => {
             featuredOptions={featuredOptions}
           />
         </div>
-        {system1Criteria && filteredProducts.length === 0 && (
+        {/* {((system1Criteria && filteredProducts.length === 0) ||
+          (system2Criteria && filteredProducts2.length === 0)) && (
           <div className="flex-grow p-4">
             <h5 className="text-2xl mt-16">
               Sorry, no products matched your search...
             </h5>
           </div>
-        )}
-        {system2Criteria && filteredProducts2.length === 0 && (
-          <div className="flex-grow p-4">
+        )} */}
+
+        {/* Display specific messages based on filter results */}
+        {(system1FiltersMessage || system2FiltersMessage) && (
+          <div className="text-2xl mt-16 p-4">
             <h5 className="text-2xl mt-16">
               Sorry, no products matched your search...
             </h5>
           </div>
         )}
+
         {(filteredProducts.length > 0 || filteredProducts2.length > 0) && (
           <div className="flex-grow p-4">
             <ProductsContainer
@@ -129,8 +146,6 @@ const Products = () => {
               products2={filteredProducts2}
               system1Criteria={system1Criteria}
               system2Criteria={system2Criteria}
-              system1FiltersMessage={system1FiltersMessage}
-              system2FiltersMessage={system2FiltersMessage}
             />
           </div>
         )}
