@@ -1,10 +1,13 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import FormCheckbox from "./FormCheckbox";
 
-const ProductList = ({ products, onSelectedChange, criteria = {}, system }) => {
-  console.log("criteria", criteria);
-  console.log("products", products);
-
+const ProductList = ({
+  products,
+  selectedPrices,
+  onPriceChange,
+  criteria = {},
+  system,
+}) => {
   // Group products for system1 based on title, company, and category
   const groupedProductsSystem1 = useMemo(() => {
     if (system !== "system1" || !products) return [];
@@ -26,16 +29,17 @@ const ProductList = ({ products, onSelectedChange, criteria = {}, system }) => {
     }, {});
   }, [products, system]);
 
-  // Render for system2: Display selected categories, shipping, and features
+  const handleCheckboxChange = (price, isChecked) => {
+    onPriceChange(price, isChecked);
+  };
+
   const renderSystem2Criteria = () => {
     if (system !== "system2") return null;
 
-    // Safely access criteria properties
     const category = criteria?.category || [];
     const shipping = criteria?.shipping || [];
     const featured = criteria?.featured || [];
 
-    // Function to join array values or return "N/A" for empty arrays
     const formatCriteria = (arr) => (arr.length > 0 ? arr.join(", ") : "N/A");
 
     return (
@@ -51,7 +55,6 @@ const ProductList = ({ products, onSelectedChange, criteria = {}, system }) => {
     );
   };
 
-  // Early return for system2 to display criteria selection only
   if (system === "system2") {
     return renderSystem2Criteria();
   }
@@ -73,10 +76,10 @@ const ProductList = ({ products, onSelectedChange, criteria = {}, system }) => {
                 {group.prices.map(({ id, price }) => (
                   <div key={id} className="flex items-center gap-2">
                     <FormCheckbox
-                      name={`price-${id}`}
-                      checked={false} // Adjust based on actual selection state
+                      key={price}
+                      checked={selectedPrices.has(price)}
                       onChange={(e) =>
-                        onSelectedChange(id, price, e.target.checked)
+                        handleCheckboxChange(price, e.target.checked)
                       }
                     />
                     <span>{price}</span>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ProductsList from "./ProductsList";
 
 const ProductsContainer = ({
@@ -8,75 +8,82 @@ const ProductsContainer = ({
   system2Criteria,
 }) => {
   const [enableNextStep, setEnableNextStep] = useState(false);
-  // State for system1 selections: titles, companies, and prices
-  const [system1Selections, setSystem1Selections] = useState({
-    titles: [],
-    companies: [],
-    prices: new Set(),
-  });
-  // State for system2 selections
-  const [system2Selections, setSystem2Selections] = useState({
-    ...system2Criteria,
-  });
 
   useEffect(() => {
-    const bothSystemsSubmitted =
-      Object.values(system1Selections).some(
-        (selection) => selection.length > 0 || selection.size > 0
-      ) &&
-      Object.values(system2Selections).some(
-        (selection) => selection.length > 0
-      );
-    const eitherProductsEmpty = products.length === 0 || products2.length === 0;
-    setEnableNextStep(bothSystemsSubmitted && !eitherProductsEmpty);
-  }, [system1Selections, system2Selections, products, products2]);
+    const criteria1Selected =
+      system1Criteria &&
+      Object.values(system1Criteria).some((criteria) => criteria.length > 0);
+    const criteria2Selected =
+      system2Criteria &&
+      Object.values(system2Criteria).some((criteria) => criteria.length > 0);
 
-  const handleSelectedChange = (system, selection, isChecked) => {
-    // Example logic for system1 (adjust according to actual data structure)
-    if (system === "system1") {
+    const bothSystemsSubmitted = criteria1Selected && criteria2Selected;
+    const eitherProductsEmpty = products.length === 0 || products2.length === 0;
+
+    setEnableNextStep(bothSystemsSubmitted && !eitherProductsEmpty);
+  }, [products, products2]);
+
+  const [selectedPrices, setSelectedPrices] = useState(
+    new Set(products.map((product) => product.attributes.price))
+  );
+
+  useEffect(() => {
+    // Update to reflect changes in products
+    const newSelectedPrices = new Set(
+      products.map((product) => product.attributes.price)
+    );
+    setSelectedPrices(newSelectedPrices);
+  }, [products]);
+
+  // Update handlePriceChange to work with prices directly
+  const handlePriceChange = (price, isChecked) => {
+    setSelectedPrices((current) => {
+      const updated = new Set(current);
       if (isChecked) {
-        setSystem1Selections((prev) => ({
-          ...prev,
-          prices: prev.prices.add(selection), // Assuming 'selection' is the price ID for simplicity
-        }));
+        updated.add(price);
       } else {
-        setSystem1Selections((prev) => {
-          const newPrices = new Set(prev.prices);
-          newPrices.delete(selection);
-          return { ...prev, prices: newPrices };
-        });
+        updated.delete(price);
       }
-    } else if (system === "system2") {
-      // Handle system2 selections similarly
-      setSystem2Selections({ ...system2Criteria, ...selection });
-    }
+      return updated;
+    });
+  };
+
+  const generateUniqueId = () => {
+    return `id_${new Date().getTime()}`;
   };
 
   const handleNextStep = () => {
+    const uniqueId = generateUniqueId();
     const passedResults = {
-      system1: Array.from(system1Selections.prices),
-      system2: system2Selections,
+      title: system1Criteria.titles,
+      prices: [...selectedPrices],
+      category: system2Criteria?.category?.join(", ") || "N/A",
+      shipping: system2Criteria?.shipping?.join(", ") || "N/A",
+      feature: system2Criteria?.featured?.join(", ") || "N/A",
+      id: uniqueId,
     };
     console.log("Proceed to the next step with selections:", passedResults);
   };
 
   return (
     <>
-      <div className="flex flex-col gap-4">
-        {/* Component structure remains unchanged */}
-        <div className="flex justify-between items-center mt-8">
-          <h4 className="font-medium text-md">
-            {enableNextStep
-              ? `System1: ${products.length} product(s)  System2: ${products2.length} product(s)`
-              : ""}
-          </h4>
+      <div className="flex flex-col gap-4 p-4">
+        <div className="justify-between items-center mt-8">
+          <h3 className="font-medium text-md my-2">
+            {products.length > 0 && `System1: ${products.length} product(s) `}
+          </h3>
+          <h3 className="font-medium text-md my-2">
+            {products2.length > 0 && `System2: ${products2.length} product(s)`}
+          </h3>
+          <p className="my-2">{enableNextStep && "Procced to next step"}</p>
         </div>
         <>
           {/* Pass `system` prop to ProductsList and update accordingly */}
           {products.length > 0 && (
             <ProductsList
               products={products}
-              onSelectedChange={handleSelectedChange}
+              selectedPrices={selectedPrices}
+              onPriceChange={handlePriceChange}
               criteria={system1Criteria}
               system="system1"
             />
@@ -84,7 +91,8 @@ const ProductsContainer = ({
           {products2.length > 0 && (
             <ProductsList
               products={products2}
-              onSelectedChange={handleSelectedChange}
+              selectedPrices={selectedPrices}
+              onPriceChange={handlePriceChange}
               criteria={system2Criteria}
               system="system2"
             />

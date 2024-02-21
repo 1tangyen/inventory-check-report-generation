@@ -129,26 +129,25 @@ const Products = () => {
             </h5>
           </div>
         )} */}
+        <div className="flex-grow p-4">
+          {/* Display specific messages based on filter results */}
+          {(system1FiltersMessage || system2FiltersMessage) && (
+            <div className="text-2xl mt-16 p-4">
+              <h5 className="text-2xl mt-16">
+                Sorry, no products matched your search...
+              </h5>
+            </div>
+          )}
 
-        {/* Display specific messages based on filter results */}
-        {(system1FiltersMessage || system2FiltersMessage) && (
-          <div className="text-2xl mt-16 p-4">
-            <h5 className="text-2xl mt-16">
-              Sorry, no products matched your search...
-            </h5>
-          </div>
-        )}
-
-        {(filteredProducts.length > 0 || filteredProducts2.length > 0) && (
-          <div className="flex-grow p-4">
+          {(filteredProducts.length > 0 || filteredProducts2.length > 0) && (
             <ProductsContainer
               products={filteredProducts}
               products2={filteredProducts2}
               system1Criteria={system1Criteria}
               system2Criteria={system2Criteria}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );
