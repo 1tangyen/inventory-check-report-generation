@@ -9,20 +9,6 @@ const ProductsContainer = ({
 }) => {
   const [enableNextStep, setEnableNextStep] = useState(false);
 
-  useEffect(() => {
-    const criteria1Selected =
-      system1Criteria &&
-      Object.values(system1Criteria).some((criteria) => criteria.length > 0);
-    const criteria2Selected =
-      system2Criteria &&
-      Object.values(system2Criteria).some((criteria) => criteria.length > 0);
-
-    const bothSystemsSubmitted = criteria1Selected && criteria2Selected;
-    const eitherProductsEmpty = products.length === 0 || products2.length === 0;
-
-    setEnableNextStep(bothSystemsSubmitted && !eitherProductsEmpty);
-  }, [products, products2]);
-
   const [selectedPrices, setSelectedPrices] = useState(
     new Set(products.map((product) => product.attributes.price))
   );
@@ -52,10 +38,28 @@ const ProductsContainer = ({
     return `id_${new Date().getTime()}`;
   };
 
+  useEffect(() => {
+    const criteria1Selected =
+      system1Criteria &&
+      Object.values(system1Criteria).some((criteria) => criteria.length > 0);
+    const criteria2Selected =
+      system2Criteria &&
+      Object.values(system2Criteria).some((criteria) => criteria.length > 0);
+
+    const bothSystemsSubmitted = criteria1Selected && criteria2Selected;
+    const eitherProductsEmpty = products.length === 0 || products2.length === 0;
+
+    setEnableNextStep(bothSystemsSubmitted && !eitherProductsEmpty);
+
+    if (selectedPrices.size === 0) {
+      setEnableNextStep(false);
+    }
+  }, [selectedPrices, products, products2]);
+
   const handleNextStep = () => {
     const uniqueId = generateUniqueId();
     const passedResults = {
-      title: system1Criteria.titles,
+      title: system1Criteria.titles.join(", "),
       prices: [...selectedPrices],
       category: system2Criteria?.category?.join(", ") || "N/A",
       shipping: system2Criteria?.shipping?.join(", ") || "N/A",
@@ -70,16 +74,18 @@ const ProductsContainer = ({
       <div className="flex flex-col gap-4 p-4">
         <div className="justify-between items-center mt-8">
           <h3 className="font-medium text-md my-2">
-            {products.length > 0 && `System1: ${products.length} product(s) `}
+            {products.length > 0 &&
+              `System1: ${selectedPrices.size} product(s) `}
           </h3>
           <h3 className="font-medium text-md my-2">
-            {products2.length > 0 && `System2: ${products2.length} product(s)`}
+            {products2.length > 0 &&
+              `System2: ${system2Criteria.category.length} product(s)`}
           </h3>
           <p className="my-2">{enableNextStep && "Procced to next step"}</p>
         </div>
         <>
           {/* Pass `system` prop to ProductsList and update accordingly */}
-          {products.length > 0 && (
+          {products.length > 0 && selectedPrices.size > 0 && (
             <ProductsList
               products={products}
               selectedPrices={selectedPrices}

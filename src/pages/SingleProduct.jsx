@@ -1,107 +1,95 @@
-import { useLoaderData } from "react-router-dom";
-import { formatPrice, customFetch } from "../utils";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-
-export const loader = async ({ params }) => {
-  const response = await customFetch(`/products/${params.id}`);
-  return { product: response.data.data };
-};
-//fetch data from assets/dummy.json
+import ProgressBar from "../components/ProgressBar";
+import { IoMdDoneAll } from "react-icons/io";
 
 const SingleProduct = () => {
-  const { product } = useLoaderData();
-  const { image, title, price, description, colors, company } =
-    product.attributes;
-  const dollarsAmount = formatPrice(price);
-  const [productColor, setProductColor] = useState(colors[0]);
-  const [amount, setAmount] = useState(1);
+  const [reportGenerationProgress, setReportGenerationProgress] = useState(0);
+  const reportIsGenerated = reportGenerationProgress >= 100;
 
-  const handleAmount = (e) => {
-    setAmount(parseInt(e.target.value));
+  const reportData = {
+    id: "id_1708555164474",
+    parameters: {
+      dateRange: "2022-08-01 to 2022-09-01",
+      userName: "User Name",
+      title: "Avant-garde Lamp",
+      prices: ["17999", "18999", "16999"],
+      category: "Kids",
+      shipping: "Etsy",
+      feature: "N/A",
+    },
+  };
+
+  const generatedOn = new Date(
+    parseInt(reportData.id.split("_")[1])
+  ).toLocaleDateString();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setReportGenerationProgress((prevProgress) => {
+        const nextProgress = prevProgress + 10;
+        if (nextProgress >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return nextProgress;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const renderParameters = (parameters) => {
+    return Object.entries(parameters).map(([key, value]) => (
+      <div
+        key={key}
+        className="flex flex-col sm:flex-row justify-between text-lg mt-2"
+      >
+        <span className="font-semibold capitalize">
+          {key.replace(/([A-Z])/g, " $1").trim()}:
+        </span>
+        <span>{Array.isArray(value) ? value.join(", ") : value}</span>
+      </div>
+    ));
   };
 
   return (
-    <section>
-      <div className="text-md breadcrumbs">
+    <section className="p-6">
+      <div className="text-lg breadcrumbs">
         <ul>
           <li>
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to="/products">Products</Link>
+            <Link to="/reports">Reports</Link>
           </li>
+          <li>Report ID: {reportData.id}</li>
         </ul>
       </div>
-      {/* PRODUCT */}
-      <div className="mt-6 grid gap-y-8 lg:grid-cols-2  lg:gap-x-16">
-        {/* IMAGE */}
-        <img
-          src={image}
-          alt={title}
-          className="w-96 h-96 object-cover rounded-lg lg:w-full  "
-        />
-        {/* PRODUCT INFO */}
-        <div>
-          <h1 className="capitalize text-3xl font-bold">{title}</h1>
-          <h4 className="text-xl text-neutral-content font-bold mt-2">
-            {company}
-          </h4>
-
-          <p className="mt-3 text-xl">{dollarsAmount}</p>
-
-          <p className="mt-6 leading-8">{description}</p>
-
-          {/* COLORS */}
-          <div className="mt-6">
-            <h4 className="text-md font-medium tracking-wider capitalize">
-              colors
-            </h4>
-            <div className="mt-2">
-              {colors.map((color) => {
-                return (
-                  <button
-                    key={color}
-                    type="button"
-                    className={`badge  w-6 h-6 mr-2  ${
-                      color === productColor && "border-2 border-secondary"
-                    }`}
-                    style={{ backgroundColor: color }}
-                    onClick={() => setProductColor(color)}
-                  ></button>
-                );
-              })}
-            </div>
-          </div>
-          {/* AMOUNT */}
-          <div className="form-control w-full max-w-xs">
-            <label className="label">
-              <h4 className="text-md font-medium tracking-wider capitalize">
-                amount
-              </h4>
-            </label>
-            <select
-              className="select select-secondary select-bordered select-md"
-              value={amount}
-              onChange={handleAmount}
-            >
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-            </select>
-          </div>
-          {/* CART BUTTON */}
-          <div className="mt-10 ">
-            <button
-              className="btn btn-secondary btn-md"
-              onClick={() => console.log("add to bag")}
-            >
-              Add to bag
-            </button>
-          </div>
+      <article className="mt-6 bg-white shadow rounded-lg overflow-hidden p-12">
+        <h1 className="text-2xl font-bold mb-4">Report Details</h1>
+        <div className="bg-gray-100 p-4 rounded-md">
+          <h2 className="text-lg font-semibold mb-2">
+            Generated on: {generatedOn}
+          </h2>
+          {renderParameters(reportData.parameters)}
         </div>
-      </div>
+        <div className="mt-6 flex items-center justify-end gap-4">
+          {reportIsGenerated ? (
+            <IoMdDoneAll size="2em" className="text-black-500" />
+          ) : (
+            <ProgressBar progress={reportGenerationProgress} />
+          )}
+          <button
+            className="btn btn-primary"
+            disabled={!reportIsGenerated}
+            onClick={() => console.log("Downloading report...")}
+          >
+            {reportIsGenerated ? "Download Report" : "Generating..."}
+          </button>
+        </div>
+      </article>
     </section>
   );
 };
+
 export default SingleProduct;
