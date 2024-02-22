@@ -1,53 +1,55 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import ProgressBar from "../components/ProgressBar";
 import { IoMdDoneAll } from "react-icons/io";
+import profileData from "../assets/profile.json"; // Ensure the path matches your file structure
 
 const SingleProduct = () => {
+  const { id } = useParams(); // Extract the report ID from the URL
+  const [reportData, setReportData] = useState(null);
   const [reportGenerationProgress, setReportGenerationProgress] = useState(0);
   const reportIsGenerated = reportGenerationProgress >= 100;
 
-  const reportData = {
-    id: "id_1708555164474",
-    parameters: {
-      dateRange: "2022-08-01 to 2022-09-01",
-      userName: "User Name",
-      title: "Avant-garde Lamp",
-      prices: ["17999", "18999", "16999"],
-      category: "Kids",
-      shipping: "Etsy",
-      feature: "N/A",
-    },
-  };
-
-  const generatedOn = new Date(
-    parseInt(reportData.id.split("_")[1])
-  ).toLocaleDateString();
+  useEffect(() => {
+    // Find and set the report data based on the ID
+    const report = profileData.users
+      .flatMap((user) => user.reports)
+      .find((report) => report.id === id);
+    if (report) {
+      setReportData(report.metadata); // Assuming the structure matches your JSON
+    }
+  }, [id]);
 
   useEffect(() => {
+    // Simulate report generation progress
     const interval = setInterval(() => {
       setReportGenerationProgress((prevProgress) => {
         const nextProgress = prevProgress + 10;
-        if (nextProgress >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return nextProgress;
+        return nextProgress >= 100 ? 100 : nextProgress;
       });
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
+  if (!reportData) {
+    return <div>Loading...</div>; // Provide better loading state as needed
+  }
+
+  // Assuming 'generatedOn' should be part of 'reportData' or calculated here
+  const generatedOn = new Date(parseInt(id.split("_")[1])).toLocaleDateString();
+
   const renderParameters = (parameters) => {
     return Object.entries(parameters).map(([key, value]) => (
       <div
         key={key}
-        className="flex flex-col sm:flex-row justify-between text-lg mt-2"
+        className="mt-2 bg-gray-100 rounded-lg p-2 flex items-center "
       >
-        <span className="font-semibold capitalize">
+        <h2 className="pr-4 text-lg font-semibold">
           {key.replace(/([A-Z])/g, " $1").trim()}:
-        </span>
-        <span>{Array.isArray(value) ? value.join(", ") : value}</span>
+        </h2>
+        <p className="text-lg">
+          {Array.isArray(value) ? value.join(", ") : value}
+        </p>
       </div>
     ));
   };
@@ -62,30 +64,33 @@ const SingleProduct = () => {
           <li>
             <Link to="/reports">Reports</Link>
           </li>
-          <li>Report ID: {reportData.id}</li>
+          <li>Report ID: {id}</li>
         </ul>
       </div>
       <article className="mt-6 bg-white shadow rounded-lg overflow-hidden p-12">
-        <h1 className="text-2xl font-bold mb-4">Report Details</h1>
+        <h1 className="text-3xl font-semibold mb-4">Report Details</h1>
         <div className="bg-gray-100 p-4 rounded-md">
-          <h2 className="text-lg font-semibold mb-2">
-            Generated on: {generatedOn}
-          </h2>
-          {renderParameters(reportData.parameters)}
+          <h2 className="text-2xl font-bold">Generated on: {generatedOn}</h2>
+          {renderParameters(reportData)}
         </div>
         <div className="mt-6 flex items-center justify-end gap-4">
           {reportIsGenerated ? (
-            <IoMdDoneAll size="2em" className="text-black-500" />
+            <button
+              className="btn btn-primary flex items-center gap-2 font-bold rounded inline-flex items-center"
+              onClick={() => console.log("Downloading report...")}
+            >
+              <svg
+                className="fill-current w-4 h-4 mr-2"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
+              </svg>
+              <span className="text-lg font-bold">Download</span>
+            </button>
           ) : (
             <ProgressBar progress={reportGenerationProgress} />
           )}
-          <button
-            className="btn btn-primary"
-            disabled={!reportIsGenerated}
-            onClick={() => console.log("Downloading report...")}
-          >
-            {reportIsGenerated ? "Download Report" : "Generating..."}
-          </button>
         </div>
       </article>
     </section>

@@ -1,0 +1,66 @@
+{
+    "users": [
+        {
+            "userId": "user1",
+            "userName": "User One",
+            "reportsRequested": 3,
+            "reports": [
+                {
+                    "id": "id_1708555164474",
+                    "metadata": {
+                        "dateRange": "2022-08-01 to 2022-09-01",
+                        "userName": "User One",
+                        "title": "Avant-garde Lamp",
+                        "prices": [
+                            "17999",
+                            "18999",
+                            "16999"
+                        ],
+                        "category": "Kids",
+                        "shipping": "Etsy",
+                        "feature": "N/A"
+                    }
+                },
+                {
+                    "id": "id_1708555164475",
+                    "metadata": {
+                        "dateRange": "2022-09-01 to 2022-10-01",
+                        "userName": "User One",
+                        "title": "Modern Desk",
+                        "prices": [
+                            "45999",
+                            "47999",
+                            "49999"
+                        ],
+                        "category": "Office",
+                        "shipping": "Direct",
+                        "feature": "Ergonomic"
+                    }
+                }
+            ]
+        },
+        {
+            "userId": "user2",
+            "userName": "User Two",
+            "reportsRequested": 2,
+            "reports": [
+                {
+                    "id": "id_1708555164476",
+                    "metadata": {
+                        "dateRange": "2022-07-01 to 2022-08-01",
+                        "userName": "User Two",
+                        "title": "Retro Clock",
+                        "prices": [
+                            "25999",
+                            "27999",
+                            "29999"
+                        ],
+                        "category": "Home Decor",
+                        "shipping": "Amazon",
+                        "feature": "Eco-Friendly"
+                    }
+                }
+            ]
+        }
+    ]
+}

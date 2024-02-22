@@ -2,7 +2,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import {
   About,
-  Cart,
+  ReportStatus,
   Checkout,
   Error,
   HomeLayout,
@@ -40,14 +40,15 @@ const router = createBrowserRouter([
         errorElement: <ErrorElement />,
       },
       {
-        path: "products/:id",
+        path: "reports/:id",
         element: <SingleProduct />,
         errorElement: <ErrorElement />,
         // loader: SingleProductLoader,
       },
       {
-        path: "Reports",
-        element: <Cart />,
+        path: "reports",
+        element: <ReportStatus />,
+        errorElement: <Error />,
       },
       {
         path: "about",
