@@ -37,5 +37,15 @@ cd inventory-check-report-generation
 # Install dependencies
 npm install
 
+
+## Documentation
+
+For more detailed information about the project, including development guidelines, API documentation, and more, please refer to our comprehensive documentation hosted on Confluence:
+
+[Project Documentation on Confluence](placeholder)
+
+Please ensure you have the necessary permissions to access the documentation.
+
+
 # Start the development server
 npm run dev
