@@ -13,10 +13,6 @@ The `inventory-check-report-generation` project is a React + Vite-based applicat
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Documentation](#documentation)
-- [Examples](#examples)
-- [Troubleshooting](#troubleshooting)
-- [Contributors](#contributors)
-- [License](#license)
 
 ## Features
 
