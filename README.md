@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The `inventory-check-report-generation` project is a React + Vite-based application designed to automate the generation of reports. This project focuses on delivering a decoupled user interface, enabling users to interact with a streamlined and efficient system for their report generation needs.
+The `inventory-check-report-generation` project is a React + Vite-based application designed to automate the generation of reports. This project focuses on delivering a decoupled user interface, enabling users to interact with a streamlined and efficient system for their report generation needs. The application's UI is hosted on AWS S3 and served through AWS CloudFront, ensuring fast and reliable access from anywhere.
 
 ## Table of Contents
 
@@ -13,11 +13,12 @@ The `inventory-check-report-generation` project is a React + Vite-based applicat
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Documentation](#documentation)
+- [Accessing the Application](#accessing-the-application)
 
 ## Features
 
 - **Report Automation Generation System**: Automates the process of generating reports, enhancing efficiency and accuracy.
-- **Decoupled UI**: Provides a clean and user-friendly interface, separate from the core logic, ensuring a smooth user experience.
+- **Decoupled UI**: Provides a clean and user-friendly interface, separate from the core logic, ensuring a smooth user experience. Hosted on AWS S3 and served through AWS CloudFront for optimized delivery.
 
 ## Dependencies
 
@@ -39,4 +40,3 @@ npm install
 
 # Start the development server
 npm run dev
-
