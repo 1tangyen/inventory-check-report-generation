@@ -17,9 +17,11 @@ import { useState, useCallback, useMemo } from "react";
 // };
 
 const Products = () => {
-  const [source] = useState(sourceData);
-  const [products] = useState(jsonData.data);
+  const [source, setSource] = useState(Object.values(sourceData));
   const [products2] = useState(dummy2.data);
+  const [selectedTitle, setSelectedTitle] = useState("");
+  // Use useEffect to filter other options based on selectedTitle
+
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredProducts2, setFilteredProducts2] = useState([]);
   const [system1Criteria, setSystem1Criteria] = useState(null);
@@ -27,25 +29,56 @@ const Products = () => {
   const [system1FiltersMessage, setSystem1FiltersMessage] = useState("");
   const [system2FiltersMessage, setSystem2FiltersMessage] = useState("");
 
+  // filter function to filter selected options exist in source data
+  // console.log("system1Criteria", system1Criteria);
   const handleFilterSubmit = useCallback(
-    (system1Criteria, system2Criteria) => {
-      let filtered = products;
-      let filtered2 = products2;
+    (system1Criteria) => {
+      let filtered = source;
 
       if (system1Criteria) {
         filtered = filtered.filter((product) => {
-          const matchTitle =
-            system1Criteria.titles.length === 0 ||
-            system1Criteria.titles.includes(product.attributes.title);
-          const matchCompany =
-            system1Criteria.companies.length === 0 ||
-            system1Criteria.companies.includes(product.attributes.company);
-          const matchPrice =
-            system1Criteria.prices.length === 0 ||
-            system1Criteria.prices.includes(
-              product.attributes.price.toString()
-            );
-          return matchTitle && matchCompany && matchPrice;
+          const matchField1 =
+            system1Criteria.field1.length === 0 ||
+            system1Criteria.field1.includes(product.field1.toLowerCase());
+          const matchField2 =
+            system1Criteria.field2.length === 0 ||
+            system1Criteria.field2.includes(product.field2.toLowerCase());
+          const matchField3 =
+            system1Criteria.field3.length === 0 ||
+            system1Criteria.field3.includes(product.field3.toLowerCase());
+          const matchField4 =
+            system1Criteria.field4.length === 0 ||
+            system1Criteria.field4.includes(product.field4.toLowerCase());
+          const matchField5 =
+            system1Criteria.field5.length === 0 ||
+            system1Criteria.field5.includes(product.field5.toLowerCase());
+          const matchField6 =
+            system1Criteria.field6.length === 0 ||
+            system1Criteria.field6.includes(product.field6.toLowerCase());
+          const matchField7 =
+            system1Criteria.field7.length === 0 ||
+            system1Criteria.field7.includes(product.field7.toLowerCase());
+          const matchField8 =
+            system1Criteria.field8.length === 0 ||
+            system1Criteria.field8.includes(product.field8.toLowerCase());
+          const matchField9 =
+            system1Criteria.field9.length === 0 ||
+            system1Criteria.field9.includes(product.field9.toLowerCase());
+          const matchField10 =
+            system1Criteria.field10.length === 0 ||
+            system1Criteria.field10.includes(product.field10.toLowerCase());
+          return (
+            matchField1 &&
+            matchField2 &&
+            matchField3 &&
+            matchField4 &&
+            matchField5 &&
+            matchField6 &&
+            matchField7 &&
+            matchField8 &&
+            matchField9 &&
+            matchField10
+          );
         });
         setFilteredProducts(filtered);
         setSystem1Criteria(system1Criteria);
@@ -55,34 +88,14 @@ const Products = () => {
             : "Sorry, no products matched your search from System 1..."
         );
       }
-
-      if (system2Criteria) {
-        filtered2 = products2.filter((product) => {
-          const matchCategory =
-            system2Criteria.category.length === 0 ||
-            system2Criteria.category.includes(product.attributes.category);
-          const matchShipping =
-            system2Criteria.shipping.length === 0 ||
-            system2Criteria.shipping.includes(product.attributes.shipping);
-          const matchFeatured =
-            system2Criteria.featured.length === 0 ||
-            system2Criteria.featured.includes(product.attributes.featured);
-          return matchCategory && matchShipping && matchFeatured;
-        });
-        setFilteredProducts2(filtered2);
-        setSystem2Criteria(system2Criteria);
-        setSystem2FiltersMessage(
-          filtered2.length > 0
-            ? ""
-            : "Sorry, no products matched your search from System 2..."
-        );
-      }
     },
     [filteredProducts, filteredProducts2]
   );
 
   const handleFilterReset = useCallback(() => {
     window.location.reload();
+    setSelectedTitle("");
+    setSource(sourceData);
     setSystem1Criteria(null);
     setSystem2Criteria(null);
     setFilteredProducts([]);
@@ -90,14 +103,7 @@ const Products = () => {
     setSystem1FiltersMessage("");
     setSystem2FiltersMessage("");
   }, []);
-
-  const generateOptions = (attribute, dataset) => {
-    return useMemo(() => {
-      return [
-        ...new Set(dataset.map((product) => product.attributes[attribute])),
-      ];
-    }, [dataset]);
-  };
+  // Extract initial options from source
 
   const generateOptions2 = (attribute, dataset) => {
     return useMemo(() => {
@@ -114,11 +120,6 @@ const Products = () => {
       return optionsArray.sort();
     }, [attribute, dataset]);
   };
-
-  // Options for select inputs
-  // const titlesOptions = generateOptions("title", products);
-  // const companiesOptions = generateOptions("company", products);
-  // const pricesOptions = generateOptions("price", products);
   const titlesOptions = generateOptions2("field1", source);
   const companiesOptions = generateOptions2("field2", source);
   const pricesOptions = generateOptions2("field3", source);
@@ -129,6 +130,37 @@ const Products = () => {
   const field8Options = generateOptions2("field8", source);
   const field9Options = generateOptions2("field9", source);
   const field10Options = generateOptions2("field10", source);
+
+  // Handle title selection change
+  const handleTitleSelectionChange = (newTitle) => {
+    setSelectedTitle(newTitle);
+  };
+
+  useEffect(() => {
+    if (selectedTitle && selectedTitle.length > 0) {
+      const normalizedSelectedTitles = selectedTitle.map((item) =>
+        item.value.toLowerCase()
+      );
+
+      const filteredSource = source.filter((item) =>
+        normalizedSelectedTitles.includes(item.field1.toLowerCase())
+      );
+
+      setSource(filteredSource);
+      // setTitlesOptions(selectedTitle);
+    } else {
+      // Reset to the original source data
+      setSource(Object.values(sourceData));
+    }
+  }, [selectedTitle]);
+
+  const generateOptions = (attribute, dataset) => {
+    return useMemo(() => {
+      return [
+        ...new Set(dataset.map((product) => product.attributes[attribute])),
+      ];
+    }, [dataset]);
+  };
 
   const categoryOptions = generateOptions("category", products2);
   const shippingOptions = generateOptions("shipping", products2);
@@ -141,8 +173,10 @@ const Products = () => {
           <Filters
             onFilterSubmit={handleFilterSubmit}
             onReset={handleFilterReset}
-            system2HasResults={filteredProducts.length > 0}
+            //sys1 sections
+            source={source}
             titlesOptions={titlesOptions}
+            handleTitleSelectionChange={handleTitleSelectionChange}
             companiesOptions={companiesOptions}
             pricesOptions={pricesOptions}
             field4Options={field4Options}
@@ -152,19 +186,14 @@ const Products = () => {
             field8Options={field8Options}
             field9Options={field9Options}
             field10Options={field10Options}
+            //sys2 sections
+            system2HasResults={filteredProducts.length > 0}
             categoryOptions={categoryOptions}
             shippingOptions={shippingOptions}
             featuredOptions={featuredOptions}
           />
         </div>
-        {/* {((system1Criteria && filteredProducts.length === 0) ||
-          (system2Criteria && filteredProducts2.length === 0)) && (
-          <div className="flex-grow p-4">
-            <h5 className="text-2xl mt-16">
-              Sorry, no products matched your search...
-            </h5>
-          </div>
-        )} */}
+
         <div className="flex-grow p-4">
           {/* Display specific messages based on filter results */}
           {(system1FiltersMessage || system2FiltersMessage) && (

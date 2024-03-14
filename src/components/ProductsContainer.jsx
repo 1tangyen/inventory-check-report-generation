@@ -10,13 +10,13 @@ const ProductsContainer = ({
   const [enableNextStep, setEnableNextStep] = useState(false);
 
   const [selectedPrices, setSelectedPrices] = useState(
-    new Set(products.map((product) => product.attributes.price))
+    new Set(products.map((product) => product.field7))
   );
 
   useEffect(() => {
     // Update to reflect changes in products
     const newSelectedPrices = new Set(
-      products.map((product) => product.attributes.price)
+      products.map((product) => product.field7)
     );
     setSelectedPrices(newSelectedPrices);
   }, [products]);

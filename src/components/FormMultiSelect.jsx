@@ -11,7 +11,7 @@ const FormMultiSelect = ({
   disabled,
 }) => {
   // The options prop expected by react-select is an array of objects with 'value' and 'label' keys
-  const selectOptions = options.map((option) => ({
+  const selectOptions = options?.map((option) => ({
     value: option,
     label: option,
   }));

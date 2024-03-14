@@ -9,32 +9,60 @@ const Filters = ({
   system2HasResults,
   onFilterSubmit,
   onReset,
+  source,
   titlesOptions,
-  companiesOptions,
-  pricesOptions,
-  field4Options,
-  field5Options,
-  field6Options,
-  field7Options,
-  field8Options,
-  field9Options,
-  field10Options,
+  selectedTitle,
+  handleTitleSelectionChange,
+
   categoryOptions,
   shippingOptions,
   featuredOptions,
 }) => {
   // State for selected options for both systems
   const [selectedSys1Filters, setSelectedSys1Filters] = useState({
-    titles: [],
-    companies: [],
-    prices: [],
+    field1: selectedTitle || [],
+    field2: [],
+    field3: [],
+    field4: [],
+    field5: [],
+    field6: [],
+    field7: [],
+    field8: [],
+    field9: [],
+    field10: [],
   });
+
   const [selectedSys2Filters, setSelectedSys2Filters] = useState({
     category: [],
     shipping: [],
     featured: [],
   });
 
+  const generateOptions = (attribute, dataset) => {
+    return useMemo(() => {
+      const optionsSet = new Set();
+      for (const key in dataset) {
+        const item = dataset[key];
+        const value = item[attribute];
+
+        if (value != null) {
+          optionsSet.add(String(value).toLowerCase());
+        }
+      }
+      const optionsArray = Array.from(optionsSet);
+      return optionsArray.sort();
+    }, [attribute, dataset]);
+  };
+
+  const companiesOptions = generateOptions("field2", source);
+  const pricesOptions = generateOptions("field3", source);
+  const field4Options = generateOptions("field4", source);
+  const field5Options = generateOptions("field5", source);
+  const field6Options = generateOptions("field6", source);
+  const field7Options = generateOptions("field7", source);
+  const field8Options = generateOptions("field8", source);
+  const field9Options = generateOptions("field9", source);
+  const field10Options = generateOptions("field10", source);
   // Handle change for system1 filters
   const handleSys1Change = (filter, selectedOption) => {
     setSelectedSys1Filters((prevFilters) => ({
@@ -50,15 +78,22 @@ const Filters = ({
       [filter]: selectedOption || [],
     }));
   };
-
+  // console.log("selectedSys1Filters", selectedSys1Filters);
   // Handle system1 submission
   const handleSys1Submit = (event) => {
     event.preventDefault();
     onFilterSubmit(
       {
-        titles: selectedSys1Filters.titles.map((option) => option.value),
-        companies: selectedSys1Filters.companies.map((option) => option.value),
-        prices: selectedSys1Filters.prices.map((option) => option.value),
+        field1: selectedSys1Filters.field1.map((option) => option.value),
+        field2: selectedSys1Filters.field2.map((option) => option.value),
+        field3: selectedSys1Filters.field3.map((option) => option.value),
+        field4: selectedSys1Filters.field4.map((option) => option.value),
+        field5: selectedSys1Filters.field5.map((option) => option.value),
+        field6: selectedSys1Filters.field6.map((option) => option.value),
+        field7: selectedSys1Filters.field7.map((option) => option.value),
+        field8: selectedSys1Filters.field8.map((option) => option.value),
+        field9: selectedSys1Filters.field9.map((option) => option.value),
+        field10: selectedSys1Filters.field10.map((option) => option.value),
       },
       null // No system2 filters yet
     );
@@ -80,9 +115,9 @@ const Filters = ({
   // Unified reset for both systems
   const handleReset = () => {
     setSelectedSys1Filters({
-      titles: [],
-      companies: [],
-      prices: [],
+      field1: [],
+      field2: [],
+      field3: [],
       field4: [],
       field5: [],
       field6: [],
@@ -115,17 +150,20 @@ const Filters = ({
               label="Select Titles"
               name="titles"
               options={titlesOptions}
-              value={selectedSys1Filters.titles}
-              onChange={(options) => handleSys1Change("titles", options)}
+              value={selectedSys1Filters.field1} // Ensure this reflects the current selection
+              onChange={(selectedOptions) => {
+                handleTitleSelectionChange(selectedOptions);
+                handleSys1Change("field1", selectedOptions);
+              }}
               size="w-full"
             />
             <FormMultiSelect
               label="Select Companies"
               name="companies"
               options={companiesOptions}
-              value={selectedSys1Filters.companies}
-              onChange={(options) => handleSys1Change("companies", options)}
-              disabled={selectedSys1Filters.titles.length === 0}
+              value={selectedSys1Filters.field2}
+              onChange={(options) => handleSys1Change("field2", options)}
+              disabled={selectedSys1Filters.field1.length === 0}
               size="w-full"
             />
 
@@ -133,73 +171,73 @@ const Filters = ({
               label="Select Prices"
               name="prices"
               options={pricesOptions}
-              value={selectedSys1Filters.prices}
-              onChange={(options) => handleSys1Change("prices", options)}
-              disabled={selectedSys1Filters.titles.length === 0}
+              value={selectedSys1Filters.field3}
+              onChange={(options) => handleSys1Change("field3", options)}
+              disabled={selectedSys1Filters.field1.length === 0}
               size="w-full"
             />
             <FormMultiSelect
               label="Select field4"
-              name="companies"
+              name="field4"
               options={field4Options}
               value={selectedSys1Filters.field4}
-              onChange={(options) => handleSys1Change("companies", options)}
-              disabled={selectedSys1Filters.titles.length === 0}
+              onChange={(options) => handleSys1Change("field4", options)}
+              disabled={selectedSys1Filters.field1.length === 0}
               size="w-full"
             />
 
             <FormMultiSelect
               label="Select field5"
-              name="prices"
+              name="field5"
               options={field5Options}
               value={selectedSys1Filters.field5}
-              onChange={(options) => handleSys1Change("prices", options)}
-              disabled={selectedSys1Filters.titles.length === 0}
+              onChange={(options) => handleSys1Change("field5", options)}
+              disabled={selectedSys1Filters.field1.length === 0}
               size="w-full"
             />
             <FormMultiSelect
               label="Select field6"
-              name="prices"
+              name="field6"
               options={field6Options}
               value={selectedSys1Filters.field6}
-              onChange={(options) => handleSys1Change("prices", options)}
-              disabled={selectedSys1Filters.titles.length === 0}
+              onChange={(options) => handleSys1Change("field6", options)}
+              disabled={selectedSys1Filters.field1.length === 0}
               size="w-full"
             />
             <FormMultiSelect
               label="Select field7"
-              name="prices"
+              name="field7"
               options={field7Options}
               value={selectedSys1Filters.field7}
-              onChange={(options) => handleSys1Change("prices", options)}
-              disabled={selectedSys1Filters.titles.length === 0}
+              onChange={(options) => handleSys1Change("field7", options)}
+              disabled={selectedSys1Filters.field1.length === 0}
               size="w-full"
             />
             <FormMultiSelect
               label="Select field8"
-              name="prices"
+              name="field8"
               options={field8Options}
               value={selectedSys1Filters.field8}
-              onChange={(options) => handleSys1Change("prices", options)}
-              disabled={selectedSys1Filters.titles.length === 0}
+              onChange={(options) => handleSys1Change("field8", options)}
+              disabled={selectedSys1Filters.field1.length === 0}
               size="w-full"
             />
             <FormMultiSelect
               label="Select field9"
-              name="prices"
+              name="field9"
               options={field9Options}
               value={selectedSys1Filters.field9}
-              onChange={(options) => handleSys1Change("prices", options)}
-              disabled={selectedSys1Filters.titles.length === 0}
+              onChange={(options) => handleSys1Change("field9", options)}
+              disabled={selectedSys1Filters.field1.length === 0}
               size="w-full"
             />
             <FormMultiSelect
               label="Select field10"
-              name="prices"
+              name="field10"
               options={field10Options}
               value={selectedSys1Filters.field10}
-              onChange={(options) => handleSys1Change("prices", options)}
-              disabled={selectedSys1Filters.titles.length === 0}
+              onChange={(options) => handleSys1Change("field10", options)}
+              disabled={selectedSys1Filters.field1.length === 0}
               size="w-full"
             />
           </Form>
@@ -208,7 +246,7 @@ const Filters = ({
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={!selectedSys1Filters.titles.length}
+              disabled={!selectedSys1Filters.field1.length}
               onClick={handleSys1Submit}
             >
               Search Products
