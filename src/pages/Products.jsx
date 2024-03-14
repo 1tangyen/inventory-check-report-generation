@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Filters, ProductsContainer } from "../components";
 import { customFetch } from "../utils";
 import jsonData from "../assets/dummy.json";
+import sourceData from "../assets/source1.json";
 import dummy2 from "../assets/dummy2.json";
 import { useLoaderData } from "react-router-dom";
 import { useState, useCallback, useMemo } from "react";
@@ -16,6 +17,7 @@ import { useState, useCallback, useMemo } from "react";
 // };
 
 const Products = () => {
+  const [source] = useState(sourceData);
   const [products] = useState(jsonData.data);
   const [products2] = useState(dummy2.data);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -97,10 +99,37 @@ const Products = () => {
     }, [dataset]);
   };
 
+  const generateOptions2 = (attribute, dataset) => {
+    return useMemo(() => {
+      const optionsSet = new Set();
+      for (const key in dataset) {
+        const item = dataset[key];
+        const value = item[attribute];
+
+        if (value != null) {
+          optionsSet.add(String(value).toLowerCase());
+        }
+      }
+      const optionsArray = Array.from(optionsSet);
+      return optionsArray.sort();
+    }, [attribute, dataset]);
+  };
+
   // Options for select inputs
-  const titlesOptions = generateOptions("title", products);
-  const companiesOptions = generateOptions("company", products);
-  const pricesOptions = generateOptions("price", products);
+  // const titlesOptions = generateOptions("title", products);
+  // const companiesOptions = generateOptions("company", products);
+  // const pricesOptions = generateOptions("price", products);
+  const titlesOptions = generateOptions2("field1", source);
+  const companiesOptions = generateOptions2("field2", source);
+  const pricesOptions = generateOptions2("field3", source);
+  const field4Options = generateOptions2("field4", source);
+  const field5Options = generateOptions2("field5", source);
+  const field6Options = generateOptions2("field6", source);
+  const field7Options = generateOptions2("field7", source);
+  const field8Options = generateOptions2("field8", source);
+  const field9Options = generateOptions2("field9", source);
+  const field10Options = generateOptions2("field10", source);
+
   const categoryOptions = generateOptions("category", products2);
   const shippingOptions = generateOptions("shipping", products2);
   const featuredOptions = generateOptions("featured", products2);
@@ -116,6 +145,13 @@ const Products = () => {
             titlesOptions={titlesOptions}
             companiesOptions={companiesOptions}
             pricesOptions={pricesOptions}
+            field4Options={field4Options}
+            field5Options={field5Options}
+            field6Options={field6Options}
+            field7Options={field7Options}
+            field8Options={field8Options}
+            field9Options={field9Options}
+            field10Options={field10Options}
             categoryOptions={categoryOptions}
             shippingOptions={shippingOptions}
             featuredOptions={featuredOptions}

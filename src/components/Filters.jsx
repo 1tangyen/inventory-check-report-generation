@@ -12,6 +12,13 @@ const Filters = ({
   titlesOptions,
   companiesOptions,
   pricesOptions,
+  field4Options,
+  field5Options,
+  field6Options,
+  field7Options,
+  field8Options,
+  field9Options,
+  field10Options,
   categoryOptions,
   shippingOptions,
   featuredOptions,
@@ -76,6 +83,13 @@ const Filters = ({
       titles: [],
       companies: [],
       prices: [],
+      field4: [],
+      field5: [],
+      field6: [],
+      field7: [],
+      field8: [],
+      field9: [],
+      field10: [],
     });
     setSelectedSys2Filters({
       category: [],
@@ -125,29 +139,65 @@ const Filters = ({
               size="w-full"
             />
             <FormMultiSelect
-              label="Select Companies"
+              label="Select field4"
               name="companies"
-              options={companiesOptions}
-              value={selectedSys1Filters.companies}
+              options={field4Options}
+              value={selectedSys1Filters.field4}
               onChange={(options) => handleSys1Change("companies", options)}
               disabled={selectedSys1Filters.titles.length === 0}
               size="w-full"
             />
 
             <FormMultiSelect
-              label="Select Prices"
+              label="Select field5"
               name="prices"
-              options={pricesOptions}
-              value={selectedSys1Filters.prices}
+              options={field5Options}
+              value={selectedSys1Filters.field5}
               onChange={(options) => handleSys1Change("prices", options)}
               disabled={selectedSys1Filters.titles.length === 0}
               size="w-full"
             />
             <FormMultiSelect
-              label="Select Prices"
+              label="Select field6"
               name="prices"
-              options={pricesOptions}
-              value={selectedSys1Filters.prices}
+              options={field6Options}
+              value={selectedSys1Filters.field6}
+              onChange={(options) => handleSys1Change("prices", options)}
+              disabled={selectedSys1Filters.titles.length === 0}
+              size="w-full"
+            />
+            <FormMultiSelect
+              label="Select field7"
+              name="prices"
+              options={field7Options}
+              value={selectedSys1Filters.field7}
+              onChange={(options) => handleSys1Change("prices", options)}
+              disabled={selectedSys1Filters.titles.length === 0}
+              size="w-full"
+            />
+            <FormMultiSelect
+              label="Select field8"
+              name="prices"
+              options={field8Options}
+              value={selectedSys1Filters.field8}
+              onChange={(options) => handleSys1Change("prices", options)}
+              disabled={selectedSys1Filters.titles.length === 0}
+              size="w-full"
+            />
+            <FormMultiSelect
+              label="Select field9"
+              name="prices"
+              options={field9Options}
+              value={selectedSys1Filters.field9}
+              onChange={(options) => handleSys1Change("prices", options)}
+              disabled={selectedSys1Filters.titles.length === 0}
+              size="w-full"
+            />
+            <FormMultiSelect
+              label="Select field10"
+              name="prices"
+              options={field10Options}
+              value={selectedSys1Filters.field10}
               onChange={(options) => handleSys1Change("prices", options)}
               disabled={selectedSys1Filters.titles.length === 0}
               size="w-full"
