@@ -5,6 +5,7 @@ import jsonData from "../assets/dummy.json";
 import dummy2 from "../assets/dummy2.json";
 import { useLoaderData } from "react-router-dom";
 import { useState, useCallback, useMemo } from "react";
+import useFetchData from "../components/API/useFetchData";
 
 // const url = "/products";
 
@@ -18,6 +19,29 @@ import { useState, useCallback, useMemo } from "react";
 const Products = () => {
   const [products] = useState(jsonData.data);
   const [products2] = useState(dummy2.data);
+
+  const [system1Parameters, setSystem1Parameters] = useState([]);
+  const [system2Parameters, setSystem2Parameters] = useState([]);
+
+  const API_respons_System1Parameters = useFetchData(`/sys1`, "GET", null);
+  const API_respons_System2Parameters = useFetchData(`/sys2`, "GET", null);
+
+  useEffect(() => {
+    if (
+      API_respons_System1Parameters.data > 0 &&
+      API_respons_System2Parameters.data > 0
+    ) {
+      setSystem1Parameters(API_respons_System1Parameters.data);
+      setSystem2Parameters(API_respons_System2Parameters.data);
+    }
+  }, [API_respons_System1Parameters, API_respons_System2Parameters]);
+
+  // console.log("system1Parameters", system1Parameters);
+  // console.log("system2Parameters", system2Parameters);
+
+  const [selectedTitle, setSelectedTitle] = useState("");
+  // Use useEffect to filter other options based on selectedTitle
+
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredProducts2, setFilteredProducts2] = useState([]);
   const [system1Criteria, setSystem1Criteria] = useState(null);
