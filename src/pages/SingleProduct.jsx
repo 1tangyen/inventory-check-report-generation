@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import ProgressBar from "../components/ProgressBar";
 import { IoMdDoneAll } from "react-icons/io";
 import profileData from "../assets/profile.json"; // Ensure the path matches your file structure
 
 const SingleProduct = () => {
-  const { id } = useParams(); // Extract the report ID from the URL
-  const [reportData, setReportData] = useState(null);
+  const { id } = useParams();
+  const { state } = useLocation();
+  const [reportData, setReportData] = useState(state || null);
   const [reportGenerationProgress, setReportGenerationProgress] = useState(0);
   const reportIsGenerated = reportGenerationProgress >= 100;
 

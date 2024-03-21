@@ -1,26 +1,15 @@
 import { useEffect } from "react";
 import { Filters, ProductsContainer } from "../components";
-import { customFetch } from "../utils";
-import jsonData from "../assets/dummy.json";
 import sourceData from "../assets/source1.json";
-import dummy2 from "../assets/dummy2.json";
-import { useLoaderData } from "react-router-dom";
+import sourceData2 from "../assets/dummy2.json";
 import { useState, useCallback, useMemo } from "react";
-
-// const url = "/products";
-
-// export const loader = async ({ request }) => {
-//   const response = await customFetch(url);
-//   const products = response.data.data;
-//   const meta = response.data.meta;
-//   return { products, meta };
-// };
 
 const Products = () => {
   const [source, setSource] = useState(Object.values(sourceData));
-  const [products2] = useState(dummy2.data);
-  const [selectedTitle, setSelectedTitle] = useState("");
-  // Use useEffect to filter other options based on selectedTitle
+  const [source2, setSource2] = useState(Object.values(sourceData2));
+
+  const [selectedTitle, setSelectedTitle] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState([]);
 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filteredProducts2, setFilteredProducts2] = useState([]);
@@ -28,143 +17,86 @@ const Products = () => {
   const [system2Criteria, setSystem2Criteria] = useState(null);
   const [system1FiltersMessage, setSystem1FiltersMessage] = useState("");
   const [system2FiltersMessage, setSystem2FiltersMessage] = useState("");
+  const extractCriteriaValues = (criteria) => {
+    // Ensure criteria is an object
+    if (typeof criteria !== "object" || criteria === null) {
+      return {};
+    }
 
-  // filter function to filter selected options exist in source data
-  // console.log("system1Criteria", system1Criteria);
+    return Object.keys(criteria).reduce((acc, key) => {
+      // Ensure each criteria field is an array before attempting to map
+      if (Array.isArray(criteria[key])) {
+        acc[key] = criteria[key].map((c) => c.value?.toLowerCase());
+      } else {
+        // Initialize as empty to handle non-array or undefined criteria fields
+        acc[key] = [];
+      }
+      return acc;
+    }, {});
+  };
+  const filterData = (data, criteriaValues) => {
+    return data.filter((product) =>
+      Object.entries(criteriaValues).every(
+        ([key, values]) =>
+          values.length === 0 || values.includes(product[key]?.toLowerCase())
+      )
+    );
+  };
+
   const handleFilterSubmit = useCallback(
-    (system1Criteria) => {
-      let filtered = source;
+    (system1Criteria = {}, system2Criteria = {}) => {
+      const system1Values = extractCriteriaValues(system1Criteria);
+      const system2Values = extractCriteriaValues(system2Criteria);
 
-      if (system1Criteria) {
-        filtered = filtered.filter((product) => {
-          const matchField1 =
-            system1Criteria.field1.length === 0 ||
-            system1Criteria.field1.includes(product.field1.toLowerCase());
-          const matchField2 =
-            system1Criteria.field2.length === 0 ||
-            system1Criteria.field2.includes(product.field2.toLowerCase());
-          const matchField3 =
-            system1Criteria.field3.length === 0 ||
-            system1Criteria.field3.includes(product.field3.toLowerCase());
-          const matchField4 =
-            system1Criteria.field4.length === 0 ||
-            system1Criteria.field4.includes(product.field4.toLowerCase());
-          const matchField5 =
-            system1Criteria.field5.length === 0 ||
-            system1Criteria.field5.includes(product.field5.toLowerCase());
-          const matchField6 =
-            system1Criteria.field6.length === 0 ||
-            system1Criteria.field6.includes(product.field6.toLowerCase());
-          const matchField7 =
-            system1Criteria.field7.length === 0 ||
-            system1Criteria.field7.includes(product.field7.toLowerCase());
-          const matchField8 =
-            system1Criteria.field8.length === 0 ||
-            system1Criteria.field8.includes(product.field8.toLowerCase());
-          const matchField9 =
-            system1Criteria.field9.length === 0 ||
-            system1Criteria.field9.includes(product.field9.toLowerCase());
-          const matchField10 =
-            system1Criteria.field10.length === 0 ||
-            system1Criteria.field10.includes(product.field10.toLowerCase());
-          return (
-            matchField1 &&
-            matchField2 &&
-            matchField3 &&
-            matchField4 &&
-            matchField5 &&
-            matchField6 &&
-            matchField7 &&
-            matchField8 &&
-            matchField9 &&
-            matchField10
-          );
-        });
+      if (Object.keys(system1Values).length > 0) {
+        const filtered = filterData(Object.values(sourceData), system1Values);
         setFilteredProducts(filtered);
         setSystem1Criteria(system1Criteria);
         setSystem1FiltersMessage(
-          filtered.length > 0
-            ? ""
-            : "Sorry, no products matched your search from System 1..."
+          filtered.length ? "" : "No matches in System 1"
+        );
+      }
+
+      if (Object.keys(system2Values).length > 0) {
+        const filtered2 = filterData(Object.values(sourceData2), system2Values);
+        setFilteredProducts2(filtered2);
+        setSystem2Criteria(system2Criteria);
+        setSystem2FiltersMessage(
+          filtered2.length ? "" : "No matches in System 2"
         );
       }
     },
-    [filteredProducts, filteredProducts2]
+    [source, source2]
   );
 
   const handleFilterReset = useCallback(() => {
-    window.location.reload();
-    setSelectedTitle("");
-    setSource(sourceData);
-    setSystem1Criteria(null);
-    setSystem2Criteria(null);
+    setSelectedTitle([]);
+    setSelectedCategory([]);
     setFilteredProducts([]);
     setFilteredProducts2([]);
     setSystem1FiltersMessage("");
     setSystem2FiltersMessage("");
   }, []);
-  // Extract initial options from source
 
-  const generateOptions2 = (attribute, dataset) => {
-    return useMemo(() => {
-      const optionsSet = new Set();
-      for (const key in dataset) {
-        const item = dataset[key];
-        const value = item[attribute];
+  const generateOptions = useCallback((attribute, dataset) => {
+    return [
+      ...new Set(
+        dataset.map((item) => item[attribute]?.toLowerCase()).filter(Boolean)
+      ),
+    ].sort();
+  }, []);
 
-        if (value != null) {
-          optionsSet.add(String(value).toLowerCase());
-        }
-      }
-      const optionsArray = Array.from(optionsSet);
-      return optionsArray.sort();
-    }, [attribute, dataset]);
-  };
-  const titlesOptions = generateOptions2("field1", source);
-  const companiesOptions = generateOptions2("field2", source);
-  const pricesOptions = generateOptions2("field3", source);
-  const field4Options = generateOptions2("field4", source);
-  const field5Options = generateOptions2("field5", source);
-  const field6Options = generateOptions2("field6", source);
-  const field7Options = generateOptions2("field7", source);
-  const field8Options = generateOptions2("field8", source);
-  const field9Options = generateOptions2("field9", source);
-  const field10Options = generateOptions2("field10", source);
+  const titlesOptions = generateOptions("field1", source);
 
-  // Handle title selection change
+  const categoryOptions = generateOptions("category", source2);
+
   const handleTitleSelectionChange = (newTitle) => {
-    setSelectedTitle(newTitle);
+    setSelectedTitle(...newTitle);
   };
 
-  useEffect(() => {
-    if (selectedTitle && selectedTitle.length > 0) {
-      const normalizedSelectedTitles = selectedTitle.map((item) =>
-        item.value.toLowerCase()
-      );
-
-      const filteredSource = source.filter((item) =>
-        normalizedSelectedTitles.includes(item.field1.toLowerCase())
-      );
-
-      setSource(filteredSource);
-      // setTitlesOptions(selectedTitle);
-    } else {
-      // Reset to the original source data
-      setSource(Object.values(sourceData));
-    }
-  }, [selectedTitle]);
-
-  const generateOptions = (attribute, dataset) => {
-    return useMemo(() => {
-      return [
-        ...new Set(dataset.map((product) => product.attributes[attribute])),
-      ];
-    }, [dataset]);
+  const handleCategorySelectionChange = (newCategory) => {
+    setSelectedCategory(...newCategory);
   };
-
-  const categoryOptions = generateOptions("category", products2);
-  const shippingOptions = generateOptions("shipping", products2);
-  const featuredOptions = generateOptions("featured", products2);
 
   return (
     <>
@@ -173,24 +105,20 @@ const Products = () => {
           <Filters
             onFilterSubmit={handleFilterSubmit}
             onReset={handleFilterReset}
+            generateOptions={generateOptions}
             //sys1 sections
             source={source}
+            system1Criteria={system1Criteria}
             titlesOptions={titlesOptions}
+            selectedTitle={selectedTitle}
             handleTitleSelectionChange={handleTitleSelectionChange}
-            companiesOptions={companiesOptions}
-            pricesOptions={pricesOptions}
-            field4Options={field4Options}
-            field5Options={field5Options}
-            field6Options={field6Options}
-            field7Options={field7Options}
-            field8Options={field8Options}
-            field9Options={field9Options}
-            field10Options={field10Options}
             //sys2 sections
-            system2HasResults={filteredProducts.length > 0}
+            source2={source2}
+            system2Criteria={system2Criteria}
             categoryOptions={categoryOptions}
-            shippingOptions={shippingOptions}
-            featuredOptions={featuredOptions}
+            selectedCategory={selectedCategory}
+            handleCategorySelectionChange={handleCategorySelectionChange}
+            system2HasResults={filteredProducts.length > 0}
           />
         </div>
 
